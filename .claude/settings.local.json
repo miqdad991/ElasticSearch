@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /c/xampp/htdocs/laravel/opensearch-dashboard/resources/views/layouts/app.blade.php /c/xampp/htdocs/laravel/opensearch-dashboard/resources/views/layouts/partials/*.blade.php)",
+      "Bash(find:*)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" --max-time 5 http://localhost:9200)",
+      "Bash(docker compose *)"
+    ]
+  }
+}

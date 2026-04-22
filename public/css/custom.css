@@ -1,0 +1,301 @@
+@charset "UTF-8";
+/*
+Template Name: osool b2g
+Author: beyond tech
+Author URI:
+Version: 1.1.0
+NB: this file contains the list of components/scss partial along with the style.scss contents order.
+details: common style for rtl and ltl
+*/
+
+/*--------------------------costum css for swal---------------------*/
+.navbar-right__menu .nav-flag-select img {
+    width: 24px !important;
+}
+.swal-text {
+    font-size: 13px !important;
+}
+.swal-title {
+    font-size: 16px !important;
+}
+.swal-icon {
+    width: 40px !important;
+    height: 40px !important;
+    margin-bottom: 7px !important;
+}
+
+.swal-icon--warning__body {
+    width: 5px;
+    height: 13px !important;
+    top: 9px !important;
+    border-radius: 2px;
+    margin-left: -2px;
+}
+
+.swal-button {
+    font-size: 12px !important;
+    padding: 6px 20px !important;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80% !important;
+    color: #dc3545 !important;
+}
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    background-image: none !important;
+}
+.page-title-wrap {
+    padding: 20px 0px 14px;
+    border-radius: 5px;
+}
+
+/*******************added on 08.07.2021*********************/
+.beneficiary_left_container {
+    padding: 10px;
+}
+.time-picker .input-container {
+    width: 98% !important;
+}
+
+.required {
+    vertical-align: top;
+    color: red !important;
+}
+.error-text {
+    font-size: 80%;
+    color: #dc3545;
+    width: 100%;
+}
+
+.custom-checkbox .noview:checked + label:after {
+    background: #dc3545 !important;
+    border: #dc3545 !important;
+}
+
+.wizard7 .checkout-shipping-form {
+    margin-top: 43px !important;
+    min-height: 247px;
+}
+
+.checkout-progress div.step.current span:nth-of-type(2) {
+    font-weight: 400;
+}
+
+.checkout-progress-indicator.content-center.col-md-10 {
+    margin: auto;
+}
+
+.checkout-progress div.step span:nth-of-type(2) {
+    font-size: 13px;
+}
+
+#toast-container > div {
+    box-shadow: none !important;
+    opacity: 1;
+}
+.toast-success,
+.toast-error,
+.toast-warning,
+.toast-info {
+    background-color: #fff !important;
+    color: #141414 !important;
+}
+
+#toast-container > .toast-success {
+    background-image: url(../img/tostr/success.png) !important;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+}
+
+#toast-container > .toast-error {
+    background-image: url(../img/tostr/error.png) !important;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+}
+
+#toast-container > .toast-warning {
+    background-image: url(../img/tostr/warning.png) !important;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+}
+
+#toast-container > .toast-info {
+    background-image: url(../img/tostr/info.png) !important;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+}
+.toast-top-center {
+    top: 10px;
+}
+
+.orderDatatable_actions li a > i {
+    color: #a2aabb;
+    font-size: 20px;
+    /*padding-right: 10px;*/
+}
+
+/**data table list **/
+.pagination {
+/*    margin-top: 20px;*/
+}
+
+.page-link {
+    min-height: 32px;
+    font-size: 14px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4.5px 11.75px;
+    border-width: 1px;
+    border-style: solid;
+    background-color: #ffffff;
+    margin: 2.5px;
+}
+.page-item.active .page-link {
+    background: #5f63f2 !important;
+}
+
+div#content_table_paginate,
+.dataTables_filter,
+.dataTables_paginate {
+    justify-content: flex-end !important;
+    display: flex !important;
+}
+@media screen and (max-width: 576px){
+    div#content_table_paginate, .dataTables_filter, .dataTables_paginate{
+        justify-content: center !important;
+    }
+}
+.r-bottom {
+    position: absolute;
+    bottom: 5%;
+    right: 0;
+}
+
+.ossol-bottom-navigation {
+/*    bottom: 2%;*/
+    background: #fff;
+}
+
+/**overlay**/
+
+#overlayer {
+    background: #ffffffa6 !important;
+}
+
+/*Date time picker*/
+
+.dropdown-menu-sbn-dt {
+    position: absolute;
+    background: #fff;
+    box-shadow: 0 5px 30px rgb(146 153 184 / 15%);
+    padding: 15px 0;
+    z-index: 2222;
+    transform: none !important;
+    padding: 23px;
+}
+
+.truncate {
+    max-width:135px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .projectDatatable.userDatatable .table th {
+    padding: 12px 9px !important;
+}
+.projectDatatable-title {
+    font-size: 12px !important;
+    font-weight: 400;
+    text-transform: capitalize;
+}
+
+
+
+.project-top-left {
+    margin-bottom: 0px !important;
+}
+
+/*login page*/
+
+.bg_layout
+{
+    background: url('../img/imgpsh_fullsize_anim.jpg') ;
+    background-size:cover;
+    width: 100%;
+    background-position: top; 
+}
+
+.fc .fc-daygrid-more-link {
+    position: relative;
+    z-index: 4;
+    cursor: pointer;
+    font-size: 1.20em;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    padding: 3px 5px;
+    display: inherit;
+    text-align: center;
+}
+.fc-daygrid-day .fc-daygrid-event .fc-daygrid-event-dot {
+    display: none !important;
+}
+.fc-timeGridDay-button, .fc-timeGridWeek-button, .fc-dayGridMonth-button{
+    display: none !important;
+}
+.fc-event-title{
+    /* display: none !important; 
+    height: 1px !important;*/
+}
+.property_stepcontainer{
+  height: 100%;
+}
+
+.badge-grey {
+    background-color: #E1E2E5;
+    color:#000000 !important;
+}
+@media screen and (min-width:567px){
+    .dataTables_wrapper .bottom{
+        display: flex;
+}
+}
+.dataTables_wrapper .bottom{
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+.dataTables_wrapper .dataTables_length label{
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+.dataTables_wrapper .dataTables_length select{
+    min-height: 0;
+    margin: 0 10px;
+    max-width: 100px;
+}
+@media screen and (max-width:567px){
+.dataTables_wrapper .dataTables_length label{
+    margin-bottom: 20px;
+    justify-content: center;
+}
+}
+.clockpicker-tick.disabled {
+    pointer-events: none;
+    color: #ddd;
+}
+.crm .card.sortable-leads{
+    margin-bottom: 15px;
+    border: 1px solid #cccccc80;
+}
+.crm .card-wrapper{
+    background: #f5f5f5;
+    border: 2px solid #fff;
+}

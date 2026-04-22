@@ -1,0 +1,91 @@
+services:
+  # --- Laravel App (PHP-FPM) ---
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opensearch2-app
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: opensearch2
+      DB_USERNAME: postgres
+      DB_PASSWORD: secret
+      OPENSEARCH_HOST: opensearch
+      OPENSEARCH_PORT: 9200
+      OPENSEARCH_SCHEME: http
+    networks:
+      - opensearch2-net
+
+  # --- Nginx ---
+  nginx:
+    image: nginx:alpine
+    container_name: opensearch2-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - opensearch2-net
+
+  # --- PostgreSQL ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: opensearch2-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: opensearch2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - opensearch2-net
+
+  # --- OpenSearch ---
+  opensearch:
+    image: opensearchproject/opensearch:2.18.0
+    container_name: opensearch2-search
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - os-data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - opensearch2-net
+
+volumes:
+  pg-data:
+  os-data:
+
+networks:
+  opensearch2-net:
+    driver: bridge

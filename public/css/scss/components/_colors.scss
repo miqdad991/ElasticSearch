@@ -1,0 +1,289 @@
+$gray-600:#6c757d;
+$gray-500:#adb5bd;
+$light-blue-1: #efeffe;
+$primary: #5f63f2;
+$text-light-1: #868eae;
+$text-color: #272b41;
+$btn-height: 48px;
+$bg-draft: #ECECEC;
+$bg-opacity-issued: #E4E4F5;
+$bg-issued: #565887;
+$lightBlue: #5a92cb;
+$bgInvoiced: #016395;
+$lightBlue1: #00A9F3;
+$bgOpacityInvoiced: rgba(1, 99, 149, .1);
+$bgRedLight:#f0e1ea;
+$bgGreenLight:#d9eae6;
+$bgOrangeLight:#f3e1c9;
+$bgRed:#f78eac;
+$bgGreen:#0CAF60;
+$bgOrange:#FFA21D;
+$newPrimary:#01A9F3;
+$bgHold:#6C757D;
+$bgHoldLight:#8a95b7;
+$bgLoss:#D81B60;
+$bgWin:#0CAF60;
+$bgOsool:#152B70;
+$bgDelete:#D81B60;
+$bgSecondary:#475466;
+$lightBlue2:#acc4cb;
+$bgClose:#64748B;
+$bgReOpen:#A91CD4;
+$bgInProgress:#5eb1ff;
+$bgNewSecondary:#566068;
+$cyan-800: #055160;
+$cyan-700: #00aca9;
+$text-cyan: $cyan-800;
+$bgExport: rgba(21, 43, 112, 0.05);
+$blueNew:#ACB4D1;
+$siteNewBlue:#1f64ff;
+$bgOpacityHold:rgba(138,149,183,.1);
+$bgOpacityNewPrimary:#bfe9fc !important;
+$bgLime:#4EDD00;
+$bgLimeLight:rgba(78, 221, 0, 0.2);
+$bgPurple:#BB2DD1;
+$bgOpacityPurple:rgba(187, 45, 209, 0.2);
+$bgChecklist:#2DA0D1;
+$bgChecklistLight:rgba(45, 160, 209, 0.2);
+$bgOpacityHold:rgba(138,149,183,.1);
+$bgAlert:#F79009;
+$bgOpacityAlert:rgba(247, 144, 9, 0.1);
+$cyan-700-opacity:rgba(0, 172, 169, 0.1);
+$text-grey:#5E6470;
+$new-form-label:#181D22; 
+$bg-grey-new:rgba(230, 247, 254, 0.5);
+$bgWarning:#fa8b0c;
+$tealGreen:#15B79E;
+$bgOpacityLoss:rgba(216, 27, 96, 0.1);
+$bgOpacityWarning:rgba(250, 139, 12, 0.05); 
+$bgWinLight:#FEC84B;
+.bgRedLight{
+    background:$bgRedLight;
+}
+.bgGreenLight{
+    background:$bgGreenLight;
+}
+.bgOrangeLight{
+    background:$bgOrangeLight;
+}
+.bgRed{
+    background:$bgRed;
+}
+.bgGreen{
+    background:$bgGreen;
+}
+.bgOrange{
+    background:$bgOrange;
+}.colorRed{
+    color:$bgRed;
+}.colorGreen{
+    color:$bgGreen;
+}.colorOrange{
+    color:$bgOrange;
+}
+.bg-new-primary{
+    background:$newPrimary;
+    &.btn{
+        color:#ffffff;
+    }
+}
+.bg-hold{
+    background:$bgHold;
+}
+.bg-loss{
+    background:$bgLoss;
+}
+.bg-win{
+    background:$bgWin;
+}
+.bg-hold-light{
+    background:$bgHoldLight;
+}
+.text-hold-light{
+    color:$bgHoldLight;
+}
+
+.text-hold{
+    color:$bgHold;
+}
+
+.text-new-primary{
+    color:$newPrimary !important;
+}
+.bg-osool-new{
+    background:$bgOsool;
+}
+.text-osool-new{
+    color:$bgOsool !important;
+}
+.bg-delete{
+    background:$bgDelete;
+}
+.text-delete{
+    color:$bgDelete;
+}
+.text-loss{
+    color:$bgLoss;
+}
+.bg-second{
+    background:$bgSecondary;
+}
+
+$bgBlueLight:rgba(62, 201, 214, 0.1);
+$bgBlue:#3EC9D6;
+.bgBlue{
+    background:$bgBlue;
+}
+.bgBlueLight{
+    background:$bgBlueLight;
+}
+.colorBlue{
+    color:$bgBlue;
+}
+.btn-export{
+    background:$bgExport;
+    &:hover{
+        background:rgba(21, 43, 112, 0.08);
+    }
+}
+.btn.bg-package2{
+    &:hover{
+        color:#fff;
+        filter: brightness(90%);
+    }
+}
+.bg-opacity-osool{
+    background:rgba(21, 43, 112, 0.1);
+}
+.bg-opacity-osool-05{
+    background:rgba(21, 43, 112, 0.05);
+}
+.bg-opacity-loss{
+    background:rgba(216, 27, 96, 0.1)
+}
+.bg-opacity-new-primary{
+    background:rgba(1, 169, 243, 0.2) !important;
+}
+.bg-opacity-new-primary-05{
+    background:rgba(1, 169, 243, 0.05) !important;
+}
+.bg-opacity-new-primary-10{
+    background:rgba(1, 169, 243, 0.1) !important;
+}
+.table{
+    &.th-osool{
+        th{
+            color:$bgOsool;
+        }
+    }
+    &.td-osool{
+        td{
+            color:$bgOsool !important;
+        }
+    }
+}
+.text-new-blue{
+    color:$blueNew;
+}
+.text-win{
+    color:$bgWin;
+}
+  .text-price-new{
+    color:rgba(21, 43, 112, 0.5);
+  }
+  .bg-new-blue{
+    background:$siteNewBlue;
+    &.btn{
+        color:#fff;
+    }
+  }
+.bg-export{
+    background:$bgExport;
+}
+.bg-opacity-win{
+    background:$bgGreenLight;
+}
+.bg-opacity-hold{
+    background:$bgOpacityHold;
+}
+.bg-export{
+    background:$bgExport;
+}
+.bg-opacity-primary-05{
+    background:rgba(95, 99, 242, 0.05);
+}
+.bg-opacity-warning-05{
+    background:rgba(250, 139, 12, 0.05);
+}
+.bg-opacity-loss-05{
+    background:rgba(216, 27, 96, 0.05)
+}
+.bg-lime{
+    background:$bgLime;
+}
+.bg-opacity-lime{
+    background:$bgLimeLight;
+}
+.text-lime{
+    color:$bgLime;
+}
+.bg-purple{
+    background:$bgPurple;
+}
+.text-purple{
+    color:$bgPurple;
+}
+.bg-opacity-purple{
+    background:$bgOpacityPurple;
+}
+.bg-checklist{
+    background:$bgChecklist;
+}
+.text-checklist{
+    color:$bgChecklist;
+}
+.bg-opacity-checklist{
+    background:$bgChecklistLight;
+}
+.border-new-primary{
+    border : 1px solid $newPrimary;
+}
+.bg-opacity-win-01{
+    background:rgb(47 185 119 / 10%);
+}
+.dash-icon-bg-6{
+    background:#d5d5ff;
+}
+.bg-opacity-alert{
+    background:$bgOpacityAlert;
+}
+.text-alert{
+    color:$bgAlert;
+}
+.border-alert{
+    border:1px solid $bgAlert;
+}
+.border-loss{
+    border:1px solid $bgLoss;
+}
+.border-win{
+    border:1px solid $bgWin;
+}
+.bg-cyan{
+    background:$cyan-700;
+}
+.bg-opacity-cyan{
+    background:$cyan-700-opacity;
+}
+.text-cyan-1{
+    color:$cyan-700 !important;
+}
+.bg-status{
+    background:#26313D;
+}
+.border-cyan{
+    border:1px solid $cyan-700 !important;
+}
+.text-grey{
+    color:#5E6470;
+}
