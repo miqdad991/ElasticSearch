@@ -72,6 +72,12 @@
                     <span class="menu-text">MC Following</span>
                 </a>
             </li>
+            <li>
+                <a href="{{ url('/mc-dashboard2') }}" class="{{ request()->is('mc-dashboard2*') ? 'active' : '' }}">
+                    <span data-feather="grid" class="nav-icon"></span>
+                    <span class="menu-text">MC Dashboard 2</span>
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

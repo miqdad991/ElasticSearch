@@ -9,6 +9,7 @@ use App\Http\Controllers\ProjectSelectController;
 use App\Http\Controllers\PropertiesDashboardController;
 use App\Http\Controllers\SyncStatusController;
 use App\Http\Controllers\UsersDashboardController;
+use App\Http\Controllers\MCDashboard2Controller;
 use App\Http\Controllers\MCFollowingDashboardController;
 use App\Http\Controllers\MCWorkordersDashboardController;
 use App\Http\Controllers\WorkOrdersDashboardController;
@@ -38,6 +39,7 @@ Route::get('/contracts',  [ContractsDashboardController::class, 'index']);
 
 Route::get('/mc-workorders', [MCWorkordersDashboardController::class, 'index'])->name('mc-workorders.dashboard');
 Route::get('/mc-following',  [MCFollowingDashboardController::class,  'index'])->name('mc-following.dashboard');
+Route::get('/mc-dashboard2', [MCDashboard2Controller::class,          'index'])->name('mc-dashboard2');
 
 Route::get('/opensearch/ping', function (Client $os) {
     return response()->json([

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Dashboard\PropertyMapService;
 use Illuminate\Http\Request;
 use OpenSearch\Client;
 
@@ -12,7 +13,7 @@ class MCWorkordersDashboardController extends Controller
         5 => 'Deleted', 6 => 'Re-open', 7 => 'Warranty', 8 => 'Scheduled',
     ];
 
-    public function __construct(private Client $os) {}
+    public function __construct(private Client $os, private PropertyMapService $propertyMap) {}
 
     public function index(Request $request)
     {
@@ -167,10 +168,13 @@ class MCWorkordersDashboardController extends Controller
 
         $months = $allMonths;
 
+        $propertyMapData = $this->propertyMap->build(session('selected_project_id'));
+
         return view('dashboards.mc-workorders', compact(
             'filters', 'totals', 'locations', 'perStatus',
             'categoryLineSeries', 'months', 'expensesByType',
-            'expensesByCategory', 'userOptions', 'contractOptions'
+            'expensesByCategory', 'userOptions', 'contractOptions',
+            'propertyMapData'
         ));
     }
 }

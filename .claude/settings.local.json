@@ -4,7 +4,13 @@
       "Bash(wc -l /c/xampp/htdocs/laravel/opensearch-dashboard/resources/views/layouts/app.blade.php /c/xampp/htdocs/laravel/opensearch-dashboard/resources/views/layouts/partials/*.blade.php)",
       "Bash(find:*)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" --max-time 5 http://localhost:9200)",
-      "Bash(docker compose *)"
+      "Bash(docker compose *)",
+      "Read(//c/xampp/htdocs/laravel//**)",
+      "Read(//c/xampp/htdocs//**)",
+      "Bash(grep -rln \"dashboards/admin\\\\|dashboards\\\\\\\\.admin\" routes/)",
+      "Bash(php -l app/Http/Controllers/MCDashboard2Controller.php)",
+      "Bash(php -l app/Services/Dashboard/WorkOrderTotalsService.php)",
+      "Bash(php artisan *)"
     ]
   }
 }
