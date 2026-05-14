@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Work Orders Dashboard')
+@section('title', __('wo.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -32,10 +32,10 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Work Orders</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Operational performance across all projects</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('wo.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('wo.subtitle') }}</p>
         </div>
-        <a href="{{ url('/work-orders') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/work-orders') }}" class="btn btn-sm btn-outline-secondary">{{ __('wo.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
@@ -50,9 +50,9 @@
             ]; @endphp
             @foreach ($opts as $key => $values)
                 <div>
-                    <label>{{ str_replace('_',' ',$key) }}</label>
+                    <label>{{ __('wo.f_' . $key) }}</label>
                     <select name="{{ $key }}">
-                        <option value="">— any —</option>
+                        <option value="">{{ __('wo.any') }}</option>
                         @foreach ($values as $v)
                             <option value="{{ $v }}" @selected(($filters[$key] ?? null) == $v)>{{ $v }}</option>
                         @endforeach
@@ -60,37 +60,37 @@
                 </div>
             @endforeach
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('wo.apply') }}</button>
     </form>
 
     <div class="grid-cards mb-3">
-        @php $i=0; @endphp
+        @php $i=0; $kpiTr = (array) __('wo.kpi'); @endphp
         @foreach ($cards as $label => $value)
             @php $i++; @endphp
             <div class="card-soft kpi kpi-{{ $i }}">
-                <div class="kpi-label">{{ $label }}</div>
+                <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                 <div class="kpi-value">{{ is_numeric($value) ? number_format($value, $label==='Total Cost'?2:0) : $value }}</div>
             </div>
         @endforeach
     </div>
 
     <div class="grid-charts mb-3">
-        <div class="card-soft span-2"><h6>📈 Monthly trend</h6><div id="ch_monthly"></div></div>
-        <div class="card-soft"><h6>🛠 By service type</h6><div id="ch_service"></div></div>
-        <div class="card-soft"><h6>⚙️ By WO type</h6><div id="ch_wo_type"></div></div>
-        <div class="card-soft"><h6>🚦 By journey stage</h6><div id="ch_journey"></div></div>
-        <div class="card-soft"><h6>📊 By status</h6><div id="ch_status"></div></div>
-        <div class="card-soft"><h6>🔥 By priority</h6><div id="ch_priority"></div></div>
-        <div class="card-soft"><h6>🏷 Top asset categories</h6><div id="ch_category"></div></div>
-        <div class="card-soft span-2"><h6>🏢 Top buildings</h6><div id="ch_building"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('wo.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_service') }}</h6><div id="ch_service"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_wo_type') }}</h6><div id="ch_wo_type"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_journey') }}</h6><div id="ch_journey"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_status') }}</h6><div id="ch_status"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_priority') }}</h6><div id="ch_priority"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_category') }}</h6><div id="ch_category"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('wo.ch_building') }}</h6><div id="ch_building"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
-        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Latest 50 work orders</div>
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('wo.tbl_title') }}</div>
         <div style="overflow-x:auto;">
             <table class="table table-sm mb-0">
                 <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                <tr>@foreach (['WO #','Created','Service','Type','Category','Priority','Journey','Status','Cost'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                <tr>@foreach ([__('wo.col_wo'),__('wo.col_created'),__('wo.col_service'),__('wo.col_type'),__('wo.col_category'),__('wo.col_priority'),__('wo.col_journey'),__('wo.col_status'),__('wo.col_cost')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                 </thead>
                 <tbody>
                 @php
@@ -115,7 +115,7 @@
                     </tr>
                 @endforeach
                 @if ($rows->isEmpty())
-                    <tr><td colspan="9" class="text-center text-muted py-4">No matching work orders.</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">{{ __('wo.empty') }}</td></tr>
                 @endif
                 </tbody>
             </table>
@@ -130,7 +130,7 @@ const charts = @json($charts);
 const PALETTE  = ['#6366f1','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#22c55e','#ef4444','#14b8a6','#f97316'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const baseChart = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });

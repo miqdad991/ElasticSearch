@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'MC Following Dashboard')
+@section('title', __('mc_follow.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -41,60 +41,60 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">MC Following</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Preventive work orders completion tracking</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('mc_follow.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('mc_follow.subtitle') }}</p>
         </div>
-        <a href="{{ url('/mc-following') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/mc-following') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_follow.reset') }}</a>
     </div>
 
     {{-- Filters --}}
     <form method="GET" action="{{ url('/mc-following') }}" class="card-soft mb-3">
         <div class="filter-bar">
             <div class="filter-group">
-                <label>From</label>
+                <label>{{ __('mc_follow.f_from') }}</label>
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}">
             </div>
             <div class="filter-group">
-                <label>To</label>
+                <label>{{ __('mc_follow.f_to') }}</label>
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}">
             </div>
             <div class="filter-group">
-                <label>Location</label>
+                <label>{{ __('mc_follow.f_location') }}</label>
                 <select name="location_id">
-                    <option value="">All Locations</option>
+                    <option value="">{{ __('mc_follow.opt_all_locations') }}</option>
                     @foreach($locationOptions as $loc)
                         <option value="{{ $loc->id }}" {{ ($filters['location_id'] ?? '') == $loc->id ? 'selected' : '' }}>{{ $loc->building_name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="filter-group">
-                <label>Service Provider / Supervisor</label>
+                <label>{{ __('mc_follow.f_user') }}</label>
                 <select name="user_id">
-                    <option value="">All Users</option>
+                    <option value="">{{ __('mc_follow.opt_all_users') }}</option>
                     @foreach($userOptions as $u)
                         <option value="{{ $u->id }}" {{ ($filters['user_id'] ?? '') == $u->id ? 'selected' : '' }}>{{ $u->display_name }} — {{ $u->type_label }}</option>
                     @endforeach
                 </select>
             </div>
             <div style="display:flex;gap:.5rem;align-items:flex-end;">
-                <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                <a href="{{ url('/mc-following') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm">{{ __('mc_follow.apply') }}</button>
+                <a href="{{ url('/mc-following') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_follow.reset_short') }}</a>
             </div>
         </div>
     </form>
 
     {{-- Stat Cards --}}
     <div class="grid-cards">
-        <div class="card-soft kpi kpi-1"><div class="kpi-label">Locations</div><div class="kpi-value">{{ number_format($totals->total_locations) }}</div></div>
-        <div class="card-soft kpi kpi-2"><div class="kpi-label">Released to System (Closed)</div><div class="kpi-value">{{ number_format($totals->total_closed) }}</div></div>
-        <div class="card-soft kpi kpi-3"><div class="kpi-label">Not Yet Released</div><div class="kpi-value">{{ number_format($totals->total_not_closed) }}</div></div>
-        <div class="card-soft kpi kpi-4"><div class="kpi-label">Completion %</div><div class="kpi-value">{{ number_format($completionPct, 1) }}%</div></div>
+        <div class="card-soft kpi kpi-1"><div class="kpi-label">{{ __('mc_follow.k_locations') }}</div><div class="kpi-value">{{ number_format($totals->total_locations) }}</div></div>
+        <div class="card-soft kpi kpi-2"><div class="kpi-label">{{ __('mc_follow.k_closed') }}</div><div class="kpi-value">{{ number_format($totals->total_closed) }}</div></div>
+        <div class="card-soft kpi kpi-3"><div class="kpi-label">{{ __('mc_follow.k_not_closed') }}</div><div class="kpi-value">{{ number_format($totals->total_not_closed) }}</div></div>
+        <div class="card-soft kpi kpi-4"><div class="kpi-label">{{ __('mc_follow.k_completion') }}</div><div class="kpi-value">{{ number_format($completionPct, 1) }}%</div></div>
     </div>
 
     {{-- Line chart (full width) --}}
     <div class="grid-full">
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">User Completion Status (Work Orders per Status over Time)</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_follow.ch_status_line') }}</h6>
             <div id="chartStatusLine"></div>
         </div>
     </div>
@@ -102,29 +102,29 @@
     {{-- Locations + Status pie --}}
     <div class="grid-2-equal">
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Work Orders by Location</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_follow.ch_location') }}</h6>
             <div id="chartLocation"></div>
         </div>
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Completion Preventive Scheduled by Status</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_follow.ch_status_pie') }}</h6>
             <div id="chartStatusPie"></div>
         </div>
     </div>
 
     {{-- Per-user completion table --}}
     <div class="card-soft" style="margin-bottom:1rem;">
-        <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">User Completion Status</h6>
+        <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_follow.tbl_title') }}</h6>
         <div class="table-scroll">
             <table class="uc-table">
                 <thead>
                     <tr>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th class="num">Total</th>
+                        <th>{{ __('mc_follow.col_user') }}</th>
+                        <th>{{ __('mc_follow.col_role') }}</th>
+                        <th class="num">{{ __('mc_follow.col_total') }}</th>
                         @foreach($statusLabels as $code => $label)
                             <th class="num">{{ $label }}</th>
                         @endforeach
-                        <th class="num">Completion %</th>
+                        <th class="num">{{ __('mc_follow.col_completion') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,7 +140,7 @@
                             <td class="num"><span class="pct-pill {{ $pctClass }}">{{ number_format($row->completion_pct, 1) }}%</span></td>
                         </tr>
                     @empty
-                        <tr><td colspan="{{ 4 + count($statusLabels) }}" style="text-align:center;padding:1.5rem;color:#94a3b8;">No user completion data.</td></tr>
+                        <tr><td colspan="{{ 4 + count($statusLabels) }}" style="text-align:center;padding:1.5rem;color:#94a3b8;">{{ __('mc_follow.empty') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -153,7 +153,7 @@
 <script>
 const PALETTE = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#eab308','#22c55e','#14b8a6','#06b6d4','#3b82f6'];
 const statusColors = { 1:'#3b82f6', 2:'#f59e0b', 3:'#94a3b8', 4:'#22c55e', 5:'#ef4444', 6:'#6366f1', 7:'#ec4899', 8:'#8b5cf6' };
-const baseOpts = { chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }}, grid:{ borderColor:'#e2e8f0', strokeDashArray:4 }, dataLabels:{ enabled:false }, tooltip:{ theme:'light' }};
+const baseOpts = { chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr' }, grid:{ borderColor:'#e2e8f0', strokeDashArray:4 }, dataLabels:{ enabled:false }, tooltip:{ theme:'light' }};
 
 // Line: WOs per status over time
 const lineLabels = @json($months);
@@ -177,7 +177,7 @@ const locValues = @json($perLocation->pluck('total'));
 new ApexCharts(document.querySelector('#chartLocation'), {
     ...baseOpts,
     chart:{ ...baseOpts.chart, type:'bar', height: Math.max(280, locLabels.length * 28) },
-    series:[{ name:'Work Orders', data: locValues }],
+    series:[{ name: @json(__('mc_follow.ch_wo_series')), data: locValues }],
     xaxis:{ categories: locLabels },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true }},
     colors: locLabels.map((_,i) => PALETTE[i % PALETTE.length]),

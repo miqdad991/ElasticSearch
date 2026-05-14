@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Assets Dashboard')
+@section('title', __('assets.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -31,87 +31,87 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Assets</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Inventory, warranty & maintenance cost rollup</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('assets.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('assets.subtitle') }}</p>
         </div>
-        <a href="{{ url('/assets') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/assets') }}" class="btn btn-sm btn-outline-secondary">{{ __('assets.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
         <div class="filter-grid">
             <div>
-                <label>category</label>
+                <label>{{ __('assets.f_asset_category_id') }}</label>
                 <select name="asset_category_id">
-                    <option value="">— any —</option>
+                    <option value="">{{ __('assets.any') }}</option>
                     @foreach ($categories as $c)
                         <option value="{{ $c->asset_category_id }}" @selected(($filters['asset_category_id'] ?? null) == $c->asset_category_id)>{{ $c->asset_category }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
-                <label>status</label>
+                <label>{{ __('assets.f_asset_status_id') }}</label>
                 <select name="asset_status_id">
-                    <option value="">— any —</option>
+                    <option value="">{{ __('assets.any') }}</option>
                     @foreach ($statuses as $s)
                         <option value="{{ $s->asset_status_id }}" @selected(($filters['asset_status_id'] ?? null) == $s->asset_status_id)>{{ $s->name }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
-                <label>building</label>
+                <label>{{ __('assets.f_building_id') }}</label>
                 <select name="building_id">
-                    <option value="">— any —</option>
+                    <option value="">{{ __('assets.any') }}</option>
                     @foreach ($buildings as $b)
                         <option value="{{ $b->building_id }}" @selected(($filters['building_id'] ?? null) == $b->building_id)>{{ $b->building_name }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
-                <label>has status</label>
+                <label>{{ __('assets.f_has_status') }}</label>
                 <select name="has_status">
-                    <option value="">— any —</option>
-                    <option value="true"  @selected(($filters['has_status'] ?? null) === 'true')>Yes</option>
-                    <option value="false" @selected(($filters['has_status'] ?? null) === 'false')>No</option>
+                    <option value="">{{ __('assets.any') }}</option>
+                    <option value="true"  @selected(($filters['has_status'] ?? null) === 'true')>{{ __('assets.opt_yes') }}</option>
+                    <option value="false" @selected(($filters['has_status'] ?? null) === 'false')>{{ __('assets.opt_no') }}</option>
                 </select>
             </div>
             <div>
-                <label>under warranty</label>
+                <label>{{ __('assets.f_under_warranty') }}</label>
                 <select name="under_warranty">
-                    <option value="">— any —</option>
-                    <option value="true"  @selected(($filters['under_warranty'] ?? null) === 'true')>Yes</option>
-                    <option value="false" @selected(($filters['under_warranty'] ?? null) === 'false')>No</option>
+                    <option value="">{{ __('assets.any') }}</option>
+                    <option value="true"  @selected(($filters['under_warranty'] ?? null) === 'true')>{{ __('assets.opt_yes') }}</option>
+                    <option value="false" @selected(($filters['under_warranty'] ?? null) === 'false')>{{ __('assets.opt_no') }}</option>
                 </select>
             </div>
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('assets.apply') }}</button>
     </form>
 
     <div class="grid-cards mb-3">
-        @php $i=0; @endphp
+        @php $i=0; $kpiTr = (array) __('assets.kpi'); @endphp
         @foreach ($cards as $label => $value)
             @php $i++; @endphp
             <div class="card-soft kpi kpi-{{ $i }}">
-                <div class="kpi-label">{{ $label }}</div>
+                <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                 <div class="kpi-value">{{ is_numeric($value) ? number_format($value, str_contains($label,'Value')?2:0) : $value }}</div>
             </div>
         @endforeach
     </div>
 
     <div class="grid-charts mb-3">
-        <div class="card-soft span-2"><h6>📈 Assets added per month</h6><div id="ch_monthly"></div></div>
-        <div class="card-soft"><h6>🏷 By category</h6><div id="ch_category"></div></div>
-        <div class="card-soft"><h6>⚡ By status</h6><div id="ch_status"></div></div>
-        <div class="card-soft"><h6>🏢 By building</h6><div id="ch_building"></div></div>
-        <div class="card-soft"><h6>🔖 By asset name</h6><div id="ch_name"></div></div>
-        <div class="card-soft span-2"><h6>🏭 Top manufacturers</h6><div id="ch_manufac"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('assets.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft"><h6>{{ __('assets.ch_category') }}</h6><div id="ch_category"></div></div>
+        <div class="card-soft"><h6>{{ __('assets.ch_status') }}</h6><div id="ch_status"></div></div>
+        <div class="card-soft"><h6>{{ __('assets.ch_building') }}</h6><div id="ch_building"></div></div>
+        <div class="card-soft"><h6>{{ __('assets.ch_name') }}</h6><div id="ch_name"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('assets.ch_manufac') }}</h6><div id="ch_manufac"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
-        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Latest 50 assets</div>
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('assets.tbl_title') }}</div>
         <div style="overflow-x:auto;">
             <table class="table table-sm mb-0">
                 <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                <tr>@foreach (['Tag','Name','Category','Status','Building','Manufacturer','Warranty','Value','Created'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                <tr>@foreach ([__('assets.col_tag'),__('assets.col_name'),__('assets.col_category'),__('assets.col_status'),__('assets.col_building'),__('assets.col_manufacturer'),__('assets.col_warranty'),__('assets.col_value'),__('assets.col_created')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                 </thead>
                 <tbody>
                 @foreach ($rows as $r)
@@ -123,16 +123,16 @@
                             @if (!empty($r['asset_status_name']))
                                 <span class="pill" style="background:#dbeafe;color:#1d4ed8;">{{ $r['asset_status_name'] }}</span>
                             @else
-                                <span class="pill" style="background:#f1f5f9;color:#475569;">none</span>
+                                <span class="pill" style="background:#f1f5f9;color:#475569;">{{ __('assets.st_none') }}</span>
                             @endif
                         </td>
                         <td>{{ $r['building_name'] ?? '—' }}</td>
                         <td>{{ $r['manufacturer_name'] ?? '—' }}</td>
                         <td>
                             @if ($r['under_warranty'] ?? false)
-                                <span class="pill" style="background:#d1fae5;color:#047857;">Active</span>
+                                <span class="pill" style="background:#d1fae5;color:#047857;">{{ __('assets.st_warranty_active') }}</span>
                             @else
-                                <span class="pill" style="background:#f1f5f9;color:#475569;">Expired</span>
+                                <span class="pill" style="background:#f1f5f9;color:#475569;">{{ __('assets.st_warranty_expired') }}</span>
                             @endif
                         </td>
                         <td class="text-right">{{ number_format($r['purchase_amount'] ?? 0, 2) }}</td>
@@ -140,7 +140,7 @@
                     </tr>
                 @endforeach
                 @if ($rows->isEmpty())
-                    <tr><td colspan="9" class="text-center text-muted py-4">No matching assets.</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">{{ __('assets.empty') }}</td></tr>
                 @endif
                 </tbody>
             </table>
@@ -155,7 +155,7 @@ const charts = @json($charts);
 const PALETTE = ['#14b8a6','#6366f1','#f59e0b','#22c55e','#a855f7','#ec4899','#0ea5e9','#ef4444','#f97316','#10b981'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const baseChart = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });

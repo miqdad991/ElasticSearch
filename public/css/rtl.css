@@ -1,0 +1,351 @@
+/* ═══════════════════════════════════════════════════════════
+   RTL overrides — loaded only when locale = ar
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Arabic font ─────────────────────────────────────────── */
+[dir="rtl"] body,
+[dir="rtl"] .navbar,
+[dir="rtl"] .sidebar,
+[dir="rtl"] .contents {
+    font-family: 'Cairo', 'Segoe UI', sans-serif;
+}
+
+/* ── Sidebar: flip from left → right ─────────────────────── */
+[dir="rtl"] .sidebar {
+    left: auto !important;
+    right: 0 !important;
+}
+[dir="rtl"] .sidebar.collapsed {
+    right: 0 !important;
+    left: auto !important;
+}
+@media (max-width: 1150px) {
+    [dir="rtl"] .sidebar.collapsed {
+        right: -76px !important;
+        left: auto !important;
+    }
+}
+
+/* ── Contents: flip padding-left → padding-right ─────────── */
+[dir="rtl"] .contents {
+    padding: 90px 295px 72px 15px !important;
+}
+@media (max-width: 1150px) {
+    [dir="rtl"] .contents {
+        padding: 73px 16px 72px 16px !important;
+    }
+}
+@media (max-width: 991px) {
+    [dir="rtl"] .contents {
+        padding: 73px 16px 64px 16px !important;
+    }
+}
+@media (max-width: 767px) {
+    [dir="rtl"] .contents {
+        padding: 56px 0 85px 0 !important;
+    }
+}
+[dir="rtl"] .contents.expanded {
+    padding-right: 93px !important;
+    padding-left: 15px !important;
+}
+
+/* ── Navbar ──────────────────────────────────────────────── */
+[dir="rtl"] .navbar {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .navbar-left {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .navbar-right__menu {
+    flex-direction: row-reverse !important;
+}
+
+/* ── Sidebar nav text alignment ──────────────────────────── */
+[dir="rtl"] .sidebar_nav li a {
+    text-align: right;
+}
+/* Swap padding so the right-side gap (before icon) stays ~1rem */
+[dir="rtl"] .sidebar__menu-group ul.sidebar_nav li > a {
+    padding-left: 1rem;
+    padding-right: .9rem;
+}
+/* Icon margin: space goes on the LEFT (between icon and text in RTL flow) */
+[dir="rtl"] .sidebar__menu-group ul.sidebar_nav li > a .nav-icon {
+    margin-right: 0 !important;
+    margin-left: 1rem !important;
+}
+[dir="rtl"] .sidebar__menu-group ul.sidebar_nav .menu-text {
+    text-align: right;
+}
+[dir="rtl"] .menu-title span {
+    display: block;
+    text-align: right;
+    padding-right: 20px;
+}
+
+/* ── KPI accent bars (all variants) ─────────────────────── */
+[dir="rtl"] .kpi {
+    padding-left: 0 !important;
+    padding-right: 1.25rem !important;
+}
+[dir="rtl"] .kpi::before {
+    left: auto !important;
+    right: 0 !important;
+    border-radius: 0 4px 4px 0 !important;
+}
+[dir="rtl"] .kpi-card {
+    padding-left: 1rem !important;
+    padding-right: 1.15rem !important;
+}
+[dir="rtl"] .kpi-card::before {
+    left: auto !important;
+    right: 0 !important;
+    border-radius: 0 4px 4px 0 !important;
+}
+[dir="rtl"] .kpi-card-label,
+[dir="rtl"] .kpi-card-value {
+    text-align: right;
+}
+[dir="rtl"] .mini-kpi {
+    text-align: right;
+}
+[dir="rtl"] .mini-kpi-label {
+    text-align: right;
+}
+
+/* ── Builder KPI toggle cards ────────────────────────────── */
+[dir="rtl"] .bld-kpi-card {
+    padding-left: 0.65rem !important;
+    padding-right: 1rem !important;
+    border-left: 1.5px solid #e2e8f0 !important;
+    border-right-width: 4px !important;
+    border-right-style: solid !important;
+    border-left-style: solid !important;
+}
+[dir="rtl"] .bld-kpi-card .kpi-check {
+    right: auto !important;
+    left: 8px !important;
+}
+[dir="rtl"] .bld-kpi-card .kpi-name {
+    text-align: right;
+}
+
+/* ── Builder chart rows + section titles ─────────────────── */
+/* Let natural RTL flex flow handle ordering: toggle/title on the right
+   (reading-start in Arabic), pills/badge on the left. */
+[dir="rtl"] .bld-section-title {
+    text-align: right;
+}
+
+/* ── Selector cards (builder select page) ────────────────── */
+[dir="rtl"] .sel-card {
+    text-align: right;
+}
+[dir="rtl"] .sel-card-arrow {
+    right: auto !important;
+    left: 1.3rem !important;
+    transform: scaleX(-1);
+}
+[dir="rtl"] .sel-card:hover .sel-card-arrow {
+    transform: scaleX(-1) translateX(-4px);
+    opacity: 1;
+}
+[dir="rtl"] .sel-card-features {
+    justify-content: flex-end;
+}
+
+/* ── Domain cards ────────────────────────────────────────── */
+/* Let natural RTL flex flow handle icon-on-right / view-link-on-left.
+   The override for `a` flips the inline `margin-left:auto` from the
+   templates so it pushes the View link to the LEFT edge in RTL. */
+[dir="rtl"] .domain-header a {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+[dir="rtl"] .domain-header-title {
+    text-align: right;
+}
+[dir="rtl"] .mini-kpi-row {
+    direction: rtl;
+}
+[dir="rtl"] .breakdown-row {
+    justify-content: flex-end;
+}
+[dir="rtl"] .stat-row-label,
+[dir="rtl"] .stat-row-value {
+    text-align: right;
+}
+[dir="rtl"] .contracts-strip {
+    direction: rtl;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+[dir="rtl"] .bld-table th,
+[dir="rtl"] .bld-table td {
+    text-align: right !important;
+}
+[dir="rtl"] .bld-table td.num {
+    text-align: left !important;
+}
+[dir="rtl"] table th,
+[dir="rtl"] table td {
+    text-align: right;
+}
+
+/* ── Filter bars ─────────────────────────────────────────── */
+/* Natural RTL flex flow already puts the first filter on the right. */
+[dir="rtl"] .filter-group label {
+    text-align: right;
+}
+[dir="rtl"] .filter-group select,
+[dir="rtl"] .filter-group input {
+    text-align: right;
+    direction: rtl;
+}
+/* Date inputs render their value LTR even in RTL — keep digits readable. */
+[dir="rtl"] .filter-group input[type=date] {
+    direction: ltr;
+    text-align: right;
+}
+
+/* ── Progress bar ────────────────────────────────────────── */
+[dir="rtl"] .progress-bar > span {
+    float: right;
+}
+
+/* ── Back links ──────────────────────────────────────────── */
+/* .back-link is plain translated text ("تعديل اللوحة" etc.) — do not mirror it.
+   The earlier scaleX(-1) was intended for arrow glyphs but the class never
+   contains one, so it just rendered the Arabic text mirrored & unreadable. */
+
+/* ── Page header areas ───────────────────────────────────── */
+[dir="rtl"] .page-bg > div[style*="text-align:center"] {
+    text-align: center !important;
+}
+/* dir="rtl" on <html> already reverses flex-direction for row containers,
+   so no flex-direction override is needed here — items naturally sit right→left. */
+
+/* Page-level gradient titles vary per page (different color stops), so we
+   leave the gradient direction alone — it's purely cosmetic. */
+
+/* ── KPI strip (overview) ────────────────────────────────── */
+[dir="rtl"] .kpi-strip {
+    direction: rtl;
+}
+
+/* ── Numbers stay LTR everywhere ─────────────────────────── */
+[dir="rtl"] .kpi-value,
+[dir="rtl"] .kpi-card-value,
+[dir="rtl"] .mini-kpi-value,
+[dir="rtl"] .stat-row-value,
+[dir="rtl"] td.num,
+[dir="rtl"] code {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+    display: inline-block;
+}
+
+/* ── Pill badges ─────────────────────────────────────────── */
+[dir="rtl"] .pill {
+    direction: rtl;
+}
+
+/* ── Charts grid ─────────────────────────────────────────── */
+[dir="rtl"] .charts-grid {
+    direction: rtl;
+}
+[dir="rtl"] .chart-wide {
+    direction: ltr; /* charts render LTR internally */
+}
+[dir="rtl"] .card-soft .card-title {
+    text-align: right;
+}
+
+/* ── Card headers ────────────────────────────────────────── */
+[dir="rtl"] [style*="border-bottom:1px solid #e2e8f0;font-weight:600"] {
+    text-align: right;
+}
+
+/* ── Inline-styled mini section titles (e.g. "By Status", "By Region") ── */
+[dir="rtl"] [style*="text-transform:uppercase"] {
+    text-align: right;
+}
+
+/* ── Arabic: kill letter-spacing & uppercase (breaks cursive joining) ── */
+[dir="rtl"] .kpi-card-label,
+[dir="rtl"] .kpi-label,
+[dir="rtl"] .mini-kpi-label,
+[dir="rtl"] .bld-table th,
+[dir="rtl"] .row-title,
+[dir="rtl"] .filter-grid label,
+[dir="rtl"] .fmd-card .title,
+[dir="rtl"] .fmd-counters .l,
+[dir="rtl"] .fmd-stat .body .l,
+[dir="rtl"] .fmd-fi label,
+[dir="rtl"] .fmd-location-strip .lbl,
+[dir="rtl"] .fmd-donut-center .l,
+[dir="rtl"] [style*="text-transform:uppercase"],
+[dir="rtl"] [style*="letter-spacing"] {
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+/* ── Per-dashboard right-align fixes ─────────────────────── */
+[dir="rtl"] .kpi-label,
+[dir="rtl"] .kpi-value,
+[dir="rtl"] .row-title,
+[dir="rtl"] .filter-grid label {
+    text-align: right;
+}
+[dir="rtl"] .row-title {
+    padding-left: 0 !important;
+    padding-right: .25rem !important;
+}
+
+/* ── MC Facilities dashboard: dropdown arrow + input icons ──────── */
+[dir="rtl"] .fmd-sel-wrap::after {
+    right: auto !important;
+    left: .6rem !important;
+}
+[dir="rtl"] .fmd-sel-wrap .fi-icon,
+[dir="rtl"] .fmd-date-wrap .fi-icon {
+    left: auto !important;
+    right: .55rem !important;
+}
+[dir="rtl"] .fmd-sel-wrap select,
+[dir="rtl"] .fmd-date-wrap input[type=date] {
+    padding-left: .75rem !important;
+    padding-right: 1.9rem !important;
+}
+[dir="rtl"] .fmd-sel-wrap select {
+    padding-left: 1.75rem !important;
+}
+
+/* ── MC Facilities counters (border separator flip) ──────── */
+[dir="rtl"] .fmd-counters > div {
+    border-right: none !important;
+    border-left: 1px solid #e2e8f0 !important;
+}
+[dir="rtl"] .fmd-counters > div:last-child {
+    border-left: none !important;
+}
+
+/* ── MC Facilities legend & stat icon alignment ──────────── */
+[dir="rtl"] .fmd-legend .pct {
+    text-align: left;
+}
+
+/* ── Scrollbar direction ─────────────────────────────────── */
+[dir="rtl"] .sidebar,
+[dir="rtl"] .contents {
+    direction: rtl;
+}
+
+/* ── ROOT FIX: style.css hardcodes `body { direction: ltr }` which
+   defeats the dir="rtl" on <html>. Restore RTL on body so default
+   text-align: start resolves to RIGHT and all titles flip correctly. ── */
+[dir="rtl"] body {
+    direction: rtl !important;
+    text-align: right;
+}

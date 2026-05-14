@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Properties Dashboard')
+@section('title', __('properties.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -36,24 +36,24 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Properties</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Portfolio composition, geography & contract coverage</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('properties.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('properties.subtitle') }}</p>
         </div>
-        <a href="{{ url('/properties') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/properties') }}" class="btn btn-sm btn-outline-secondary">{{ __('properties.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
         <div class="filter-grid">
             @php $simple = [
-                'property_type' => ['building' => 'Building', 'complex' => 'Complex'],
-                'location_type' => ['single_location' => 'Single location', 'multiple_location' => 'Multiple locations'],
-                'status'        => [1 => 'Active', 0 => 'Inactive'],
+                'property_type' => ['building' => __('properties.opt_building'), 'complex' => __('properties.opt_complex')],
+                'location_type' => ['single_location' => __('properties.opt_single_location'), 'multiple_location' => __('properties.opt_multiple_location')],
+                'status'        => [1 => __('properties.opt_active'), 0 => __('properties.opt_inactive')],
             ]; @endphp
             @foreach ($simple as $key => $values)
                 <div>
-                    <label>{{ str_replace('_',' ',$key) }}</label>
+                    <label>{{ __('properties.f_' . $key) }}</label>
                     <select name="{{ $key }}">
-                        <option value="">— any —</option>
+                        <option value="">{{ __('properties.any') }}</option>
                         @foreach ($values as $val => $lbl)
                             <option value="{{ $val }}" @selected(($filters[$key] ?? null) == $val)>{{ $lbl }}</option>
                         @endforeach
@@ -62,9 +62,9 @@
             @endforeach
 
             <div>
-                <label>region</label>
+                <label>{{ __('properties.f_region') }}</label>
                 <select name="region_id">
-                    <option value="">— any —</option>
+                    <option value="">{{ __('properties.any') }}</option>
                     @foreach ($regions as $r)
                         <option value="{{ $r->region_id }}" @selected(($filters['region_id'] ?? null) == $r->region_id)>{{ $r->name }}</option>
                     @endforeach
@@ -72,25 +72,26 @@
             </div>
 
             <div>
-                <label>city</label>
+                <label>{{ __('properties.f_city') }}</label>
                 <select name="city_id">
-                    <option value="">— any —</option>
+                    <option value="">{{ __('properties.any') }}</option>
                     @foreach ($cities as $c)
                         <option value="{{ $c->city_id }}" @selected(($filters['city_id'] ?? null) == $c->city_id)>{{ $c->name_en }}</option>
                     @endforeach
                 </select>
             </div>
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('properties.apply') }}</button>
     </form>
 
     @php
         $rowGroups = [
-            'Properties' => ['Total Properties','Total Buildings','Single Buildings','Complexes','Active Properties'],
-            'Contracts'  => ['Total Contracts','Active Contracts','Rent Contracts','Lease Contracts','Total Budget'],
-            'Operations' => ['Total Assets','Total Work Orders','Maintenance Requests','Service Providers','Total WO Cost'],
+            __('properties.row_properties') => ['Total Properties','Total Buildings','Single Buildings','Complexes','Active Properties'],
+            __('properties.row_contracts')  => ['Total Contracts','Active Contracts','Rent Contracts','Lease Contracts','Total Budget'],
+            __('properties.row_operations') => ['Total Assets','Total Work Orders','Maintenance Requests','Service Providers','Total WO Cost'],
         ];
         $idx = 0;
+        $kpiTr = (array) __('properties.kpi');
     @endphp
     @foreach ($rowGroups as $rowTitle => $labels)
         <div class="row-title">{{ $rowTitle }}</div>
@@ -98,7 +99,7 @@
             @foreach ($labels as $label)
                 @php $idx++; $value = $cards[$label] ?? 0; @endphp
                 <div class="card-soft kpi kpi-{{ $idx }}">
-                    <div class="kpi-label">{{ $label }}</div>
+                    <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                     <div class="kpi-value">
                         {{ is_numeric($value) ? number_format($value, in_array($label,['Total Budget','Total WO Cost'])?2:0) : $value }}
                     </div>
@@ -108,20 +109,20 @@
     @endforeach
 
     <div class="grid-charts mb-3">
-        <div class="card-soft span-2"><h6>📈 Properties added per month</h6><div id="ch_monthly"></div></div>
-        <div class="card-soft"><h6>🏘 By property type</h6><div id="ch_type"></div></div>
-        <div class="card-soft"><h6>⚡ Status</h6><div id="ch_status"></div></div>
-        <div class="card-soft"><h6>🗺 By region</h6><div id="ch_region"></div></div>
-        <div class="card-soft"><h6>🏙 By city</h6><div id="ch_city"></div></div>
-        <div class="card-soft span-2"><h6>🏆 Top properties by contract count</h6><div id="ch_top"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('properties.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft"><h6>{{ __('properties.ch_type') }}</h6><div id="ch_type"></div></div>
+        <div class="card-soft"><h6>{{ __('properties.ch_status') }}</h6><div id="ch_status"></div></div>
+        <div class="card-soft"><h6>{{ __('properties.ch_region') }}</h6><div id="ch_region"></div></div>
+        <div class="card-soft"><h6>{{ __('properties.ch_city') }}</h6><div id="ch_city"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('properties.ch_top') }}</h6><div id="ch_top"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
-        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Latest 50 properties</div>
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('properties.tbl_title') }}</div>
         <div style="overflow-x:auto;">
             <table class="table table-sm mb-0">
                 <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                <tr>@foreach (['Name','Tag','Type','Region','City','Buildings','Floors','Units','Status','Created'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                <tr>@foreach ([__('properties.col_name'),__('properties.col_tag'),__('properties.col_type'),__('properties.col_region'),__('properties.col_city'),__('properties.col_buildings'),__('properties.col_floors'),__('properties.col_units'),__('properties.col_status'),__('properties.col_created')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                 </thead>
                 <tbody>
                 @foreach ($rows as $r)
@@ -134,12 +135,12 @@
                         <td class="text-right">{{ $r['buildings_count'] ?? 0 }}</td>
                         <td class="text-right">{{ $r['total_floors'] ?? '—' }}</td>
                         <td class="text-right">{{ $r['total_units'] ?? '—' }}</td>
-                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false)?'Active':'Inactive' }}</span></td>
+                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false) ? __('properties.st_active') : __('properties.st_inactive') }}</span></td>
                         <td>{{ !empty($r['created_at']) ? \Illuminate\Support\Carbon::parse($r['created_at'])->format('Y-m-d') : '—' }}</td>
                     </tr>
                 @endforeach
                 @if (empty($rows) || (is_countable($rows) && count($rows) === 0))
-                    <tr><td colspan="10" class="text-center text-muted py-4">No matching properties.</td></tr>
+                    <tr><td colspan="10" class="text-center text-muted py-4">{{ __('properties.empty') }}</td></tr>
                 @endif
                 </tbody>
             </table>
@@ -154,7 +155,7 @@ const charts = @json($charts);
 const PALETTE  = ['#0ea5e9','#10b981','#f59e0b','#8b5cf6','#22c55e','#6366f1','#ec4899','#14b8a6','#f97316','#ef4444'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const baseChart = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });

@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'page_title' => 'لوحة العقارات',
+    'heading'    => 'العقارات',
+    'subtitle'   => 'تكوين المحفظة والتوزيع الجغرافي وتغطية العقود',
+
+    'reset'      => 'إعادة ضبط الفلاتر',
+    'apply'      => 'تطبيق',
+    'any'        => '— الكل —',
+
+    'f_property_type' => 'نوع العقار',
+    'f_location_type' => 'نوع الموقع',
+    'f_status'        => 'الحالة',
+    'f_region'        => 'المنطقة',
+    'f_city'          => 'المدينة',
+
+    'opt_building'          => 'مبنى',
+    'opt_complex'           => 'مجمع',
+    'opt_single_location'   => 'موقع واحد',
+    'opt_multiple_location' => 'مواقع متعددة',
+    'opt_active'            => 'نشط',
+    'opt_inactive'          => 'غير نشط',
+
+    'row_properties' => 'العقارات',
+    'row_contracts'  => 'العقود',
+    'row_operations' => 'العمليات',
+
+    'kpi' => [
+        'Total Properties'    => 'إجمالي العقارات',
+        'Total Buildings'     => 'إجمالي المباني',
+        'Single Buildings'    => 'مباني منفردة',
+        'Complexes'           => 'مجمعات',
+        'Active Properties'   => 'العقارات النشطة',
+        'Total Contracts'     => 'إجمالي العقود',
+        'Active Contracts'    => 'العقود النشطة',
+        'Rent Contracts'      => 'عقود الإيجار',
+        'Lease Contracts'     => 'عقود التأجير',
+        'Total Budget'        => 'إجمالي الميزانية',
+        'Total Assets'        => 'إجمالي الأصول',
+        'Total Work Orders'   => 'إجمالي أوامر العمل',
+        'Maintenance Requests'=> 'طلبات الصيانة',
+        'Service Providers'   => 'مزودو الخدمة',
+        'Total WO Cost'       => 'إجمالي تكلفة أوامر العمل',
+    ],
+
+    'ch_monthly' => '📈 العقارات المضافة شهريًا',
+    'ch_type'    => '🏘 حسب نوع العقار',
+    'ch_status'  => '⚡ الحالة',
+    'ch_region'  => '🗺 حسب المنطقة',
+    'ch_city'    => '🏙 حسب المدينة',
+    'ch_top'     => '🏆 أعلى العقارات حسب عدد العقود',
+
+    'tbl_title'    => 'أحدث 50 عقارًا',
+    'col_name'     => 'الاسم',
+    'col_tag'      => 'الرمز',
+    'col_type'     => 'النوع',
+    'col_region'   => 'المنطقة',
+    'col_city'     => 'المدينة',
+    'col_buildings'=> 'المباني',
+    'col_floors'   => 'الأدوار',
+    'col_units'    => 'الوحدات',
+    'col_status'   => 'الحالة',
+    'col_created'  => 'تاريخ الإنشاء',
+    'st_active'    => 'نشط',
+    'st_inactive'  => 'غير نشط',
+    'empty'        => 'لا توجد عقارات مطابقة.',
+];

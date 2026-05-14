@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Contracts Dashboard')
+@section('title', __('contracts.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding:1.25rem; border-radius:12px; }
@@ -27,10 +27,10 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Execution Contracts</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Service provider spend, payment tracking & WO extras</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('contracts.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('contracts.subtitle') }}</p>
         </div>
-        <a href="{{ url('/contracts') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/contracts') }}" class="btn btn-sm btn-outline-secondary">{{ __('contracts.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
@@ -42,9 +42,9 @@
             ]; @endphp
             @foreach ($opts as $key => $values)
                 <div>
-                    <label>{{ str_replace('_',' ',$key) }}</label>
+                    <label>{{ __('contracts.f_' . $key) }}</label>
                     <select name="{{ $key }}">
-                        <option value="">— any —</option>
+                        <option value="">{{ __('contracts.any') }}</option>
                         @foreach ($values as $v)
                             <option value="{{ $v }}" @selected(($filters[$key] ?? null) == $v)>{{ $v }}</option>
                         @endforeach
@@ -52,7 +52,7 @@
                 </div>
             @endforeach
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('contracts.apply') }}</button>
     </form>
 
     @php
@@ -62,11 +62,12 @@
             'row3' => ['Subcontracts','Expired','Closed WOs','WO Extras Total'],
         ];
     @endphp
+    @php $kpiTr = (array) __('contracts.kpi'); @endphp
     @foreach ($rowCards as $cls => $labels)
         <div class="grid-cards mb-3">
             @foreach ($labels as $label)
                 <div class="card-soft kpi {{ $cls }}">
-                    <div class="kpi-label">{{ $label }}</div>
+                    <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                     <div class="kpi-value">
                         {{ is_numeric($cards[$label]) ? number_format($cards[$label], in_array($label,['Total Contracts','Active','Subcontracts','Expired','Closed WOs'])?0:2) : $cards[$label] }}
                     </div>
@@ -76,17 +77,17 @@
     @endforeach
 
     <div class="grid-charts mb-3">
-        <div class="card-soft"><h6>📄 Value by contract type</h6><div id="ch_type"></div></div>
-        <div class="card-soft"><h6>🏢 Top service providers by value</h6><div id="ch_sp"></div></div>
-        <div class="card-soft span-2"><h6>🚨 Top contracts by overdue amount</h6><div id="ch_overdue"></div></div>
+        <div class="card-soft"><h6>{{ __('contracts.ch_type') }}</h6><div id="ch_type"></div></div>
+        <div class="card-soft"><h6>{{ __('contracts.ch_sp') }}</h6><div id="ch_sp"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('contracts.ch_overdue') }}</h6><div id="ch_overdue"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
-        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Top 30 contracts by value</div>
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('contracts.tbl_title') }}</div>
         <div style="overflow-x:auto;">
             <table class="table table-sm mb-0">
                 <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                <tr>@foreach (['Contract','Type','Service Provider','Start','End','Value','Paid %','Overdue','Status'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                <tr>@foreach ([__('contracts.col_contract'),__('contracts.col_type'),__('contracts.col_sp'),__('contracts.col_start'),__('contracts.col_end'),__('contracts.col_value'),__('contracts.col_paid_pct'),__('contracts.col_overdue'),__('contracts.col_status')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                 </thead>
                 <tbody>
                 @foreach ($rows as $r)
@@ -98,7 +99,7 @@
                     <tr>
                         <td>
                             <code style="color:#4338ca;">{{ $r['contract_number'] ?? '' }}</code>
-                            @if (!empty($r['is_subcontract'])) <span class="pill" style="background:#ede9fe;color:#6d28d9;">sub</span> @endif
+                            @if (!empty($r['is_subcontract'])) <span class="pill" style="background:#ede9fe;color:#6d28d9;">{{ __('contracts.pill_sub') }}</span> @endif
                         </td>
                         <td>{{ $r['contract_type_name'] ?? '—' }}</td>
                         <td>{{ $r['service_provider_name'] ?? '—' }}</td>
@@ -120,16 +121,16 @@
                         </td>
                         <td>
                             @if (!empty($r['is_expired']))
-                                <span class="pill" style="background:#f1f5f9;color:#475569;">Expired</span>
+                                <span class="pill" style="background:#f1f5f9;color:#475569;">{{ __('contracts.st_expired') }}</span>
                             @elseif (!empty($r['is_active']))
-                                <span class="pill" style="background:#d1fae5;color:#047857;">Active</span>
+                                <span class="pill" style="background:#d1fae5;color:#047857;">{{ __('contracts.st_active') }}</span>
                             @else
-                                <span class="pill" style="background:#fef3c7;color:#b45309;">Inactive</span>
+                                <span class="pill" style="background:#fef3c7;color:#b45309;">{{ __('contracts.st_inactive') }}</span>
                             @endif
                         </td>
                     </tr>
                 @endforeach
-                @if ($rows->isEmpty()) <tr><td colspan="9" class="text-center text-muted py-4">No contracts.</td></tr> @endif
+                @if ($rows->isEmpty()) <tr><td colspan="9" class="text-center text-muted py-4">{{ __('contracts.empty') }}</td></tr> @endif
                 </tbody>
             </table>
         </div>
@@ -143,7 +144,7 @@ const charts = @json($charts);
 const PALETTE = ['#6366f1','#22c55e','#f59e0b','#ef4444','#06b6d4','#a855f7','#ec4899','#14b8a6','#f97316','#10b981'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const base = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });

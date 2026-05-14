@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'MC Workorders Dashboard')
+@section('title', __('mc_wo.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -66,72 +66,72 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">MC Workorders</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Management company work orders overview</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('mc_wo.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('mc_wo.subtitle') }}</p>
         </div>
-        <a href="{{ url('/mc-workorders') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/mc-workorders') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_wo.reset') }}</a>
     </div>
 
     {{-- Filters --}}
     <form method="GET" action="{{ url('/mc-workorders') }}" class="card-soft mb-3">
         <div class="filter-bar">
             <div class="filter-group">
-                <label>From</label>
+                <label>{{ __('mc_wo.f_from') }}</label>
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}">
             </div>
             <div class="filter-group">
-                <label>To</label>
+                <label>{{ __('mc_wo.f_to') }}</label>
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}">
             </div>
             <div class="filter-group">
-                <label>User</label>
+                <label>{{ __('mc_wo.f_user') }}</label>
                 <select name="user_id">
-                    <option value="">All Users</option>
+                    <option value="">{{ __('mc_wo.opt_all_users') }}</option>
                     @foreach($userOptions as $u)
                         <option value="{{ $u->id }}" {{ ($filters['user_id'] ?? '') == $u->id ? 'selected' : '' }}>{{ $u->display_name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="filter-group">
-                <label>Contract</label>
+                <label>{{ __('mc_wo.f_contract') }}</label>
                 <select name="contract_id">
-                    <option value="">All Contracts</option>
+                    <option value="">{{ __('mc_wo.opt_all_contracts') }}</option>
                     @foreach($contractOptions as $c)
                         <option value="{{ $c->id }}" {{ ($filters['contract_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->display_name }}</option>
                     @endforeach
                 </select>
             </div>
             <div style="display:flex;gap:.5rem;align-items:flex-end;">
-                <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                <a href="{{ url('/mc-workorders') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm">{{ __('mc_wo.apply') }}</button>
+                <a href="{{ url('/mc-workorders') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_wo.reset_short') }}</a>
             </div>
         </div>
     </form>
 
     {{-- Stat Cards Row 1 --}}
     <div class="grid-cards">
-        <div class="card-soft kpi kpi-1"><div class="kpi-label">Locations</div><div class="kpi-value">{{ number_format($totals->total_locations) }}</div></div>
-        <div class="card-soft kpi kpi-2"><div class="kpi-label">Contracts</div><div class="kpi-value">{{ number_format($totals->total_contracts) }}</div></div>
-        <div class="card-soft kpi kpi-3"><div class="kpi-label">Total Work Orders</div><div class="kpi-value">{{ number_format($totals->total_workorders) }}</div></div>
-        <div class="card-soft kpi kpi-4"><div class="kpi-label">Total Expenses</div><div class="kpi-value">{{ number_format($totals->total_expenses, 2) }}</div></div>
+        <div class="card-soft kpi kpi-1"><div class="kpi-label">{{ __('mc_wo.k_locations') }}</div><div class="kpi-value">{{ number_format($totals->total_locations) }}</div></div>
+        <div class="card-soft kpi kpi-2"><div class="kpi-label">{{ __('mc_wo.k_contracts') }}</div><div class="kpi-value">{{ number_format($totals->total_contracts) }}</div></div>
+        <div class="card-soft kpi kpi-3"><div class="kpi-label">{{ __('mc_wo.k_total_wo') }}</div><div class="kpi-value">{{ number_format($totals->total_workorders) }}</div></div>
+        <div class="card-soft kpi kpi-4"><div class="kpi-label">{{ __('mc_wo.k_total_exp') }}</div><div class="kpi-value">{{ number_format($totals->total_expenses, 2) }}</div></div>
     </div>
 
     {{-- Stat Cards Row 2 --}}
     <div class="grid-cards">
-        <div class="card-soft kpi kpi-5"><div class="kpi-label">Reactive</div><div class="kpi-value">{{ number_format($totals->total_reactive) }}</div></div>
-        <div class="card-soft kpi kpi-6"><div class="kpi-label">Preventive</div><div class="kpi-value">{{ number_format($totals->total_preventive) }}</div></div>
-        <div class="card-soft kpi kpi-7"><div class="kpi-label">Late Execution Time</div><div class="kpi-value">{{ number_format($totals->late_execution) }}</div></div>
-        <div class="card-soft kpi kpi-8"><div class="kpi-label">Late Response Time</div><div class="kpi-value">-</div></div>
+        <div class="card-soft kpi kpi-5"><div class="kpi-label">{{ __('mc_wo.k_reactive') }}</div><div class="kpi-value">{{ number_format($totals->total_reactive) }}</div></div>
+        <div class="card-soft kpi kpi-6"><div class="kpi-label">{{ __('mc_wo.k_preventive') }}</div><div class="kpi-value">{{ number_format($totals->total_preventive) }}</div></div>
+        <div class="card-soft kpi kpi-7"><div class="kpi-label">{{ __('mc_wo.k_late_exec') }}</div><div class="kpi-value">{{ number_format($totals->late_execution) }}</div></div>
+        <div class="card-soft kpi kpi-8"><div class="kpi-label">{{ __('mc_wo.k_late_resp') }}</div><div class="kpi-value">-</div></div>
     </div>
 
     {{-- Line chart + expenses pie --}}
     <div class="grid-2">
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Work Orders by Category</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_wo.ch_category') }}</h6>
             <div id="chartCategoryLine"></div>
         </div>
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Total Expenses</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_wo.ch_expenses') }}</h6>
             <div id="chartExpensesPie"></div>
         </div>
     </div>
@@ -139,21 +139,21 @@
     {{-- Location names + Status --}}
     <div class="grid-2-equal">
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Location Names</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_wo.ch_locations') }}</h6>
             <div id="chartLocations"></div>
         </div>
         <div class="card-soft">
-            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Work Order Status</h6>
+            <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_wo.ch_status') }}</h6>
             <div id="chartStatus"></div>
         </div>
     </div>
 
     {{-- Expenses by category --}}
     <div class="card-soft" style="margin-bottom:1rem;">
-        <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">Expenses by Category</h6>
+        <h6 style="font-weight:600;color:#1e293b;margin-bottom:.75rem;">{{ __('mc_wo.ch_exp_by_cat') }}</h6>
         <table class="exp-table">
             <thead>
-                <tr><th>Category</th><th class="num">Work Orders</th><th class="num">Total Cost</th></tr>
+                <tr><th>{{ __('mc_wo.col_category') }}</th><th class="num">{{ __('mc_wo.col_wo_count') }}</th><th class="num">{{ __('mc_wo.col_total_cost') }}</th></tr>
             </thead>
             <tbody>
                 @forelse($expensesByCategory as $row)
@@ -163,7 +163,7 @@
                         <td class="num">{{ number_format($row->total, 2) }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#94a3b8;">No expense data.</td></tr>
+                    <tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#94a3b8;">{{ __('mc_wo.empty_exp') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -172,7 +172,7 @@
     {{-- Properties map --}}
     <div class="card-soft map-card">
         <div class="map-card-header">
-            <h6>Properties by Location</h6>
+            <h6>{{ __('mc_wo.ch_map') }}</h6>
         </div>
         <div id="map_container"></div>
     </div>
@@ -180,9 +180,30 @@
 @endsection
 
 @section('scripts')
+@php
+    $mcWoTr = [
+        'col_wo_count'        => __('mc_wo.col_wo_count'),
+        'chart_total'         => __('mc_wo.chart_total'),
+        'p_type'              => __('mc_wo.p_type'),
+        'p_buildings'         => __('mc_wo.p_buildings'),
+        'p_total_wos'         => __('mc_wo.p_total_wos'),
+        'p_preventive'        => __('mc_wo.p_preventive'),
+        'p_reactive'          => __('mc_wo.p_reactive'),
+        'tab_all'             => __('mc_wo.tab_all'),
+        'tab_7d'              => __('mc_wo.tab_7d'),
+        'tab_30d'             => __('mc_wo.tab_30d'),
+        'pm_rm_split'         => __('mc_wo.pm_rm_split'),
+        'no_service_dist'     => __('mc_wo.no_service_dist'),
+        'no_wos_window'       => __('mc_wo.no_wos_window'),
+        'nav_prev'            => __('mc_wo.nav_prev'),
+        'nav_next'            => __('mc_wo.nav_next'),
+        'p_building_fallback' => __('mc_wo.p_building_fallback'),
+    ];
+@endphp
 <script>
+const MC_WO_TR = @json($mcWoTr);
 const PALETTE = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#eab308','#22c55e','#14b8a6','#06b6d4','#3b82f6'];
-const baseOpts = { chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }}, grid:{ borderColor:'#e2e8f0', strokeDashArray:4 }, dataLabels:{ enabled:false }, tooltip:{ theme:'light' }};
+const baseOpts = { chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr' }, grid:{ borderColor:'#e2e8f0', strokeDashArray:4 }, dataLabels:{ enabled:false }, tooltip:{ theme:'light' }};
 
 // Category Line Chart
 const lineLabels = @json($months);
@@ -221,7 +242,7 @@ const locValues = @json($locations->pluck('total'));
 new ApexCharts(document.querySelector('#chartLocations'), {
     ...baseOpts,
     chart:{ ...baseOpts.chart, type:'bar', height: Math.max(280, locLabels.length * 28) },
-    series:[{ name:'Work Orders', data: locValues }],
+    series:[{ name: MC_WO_TR.col_wo_count, data: locValues }],
     xaxis:{ categories: locLabels },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true }},
     colors: locLabels.map((_,i) => PALETTE[i % PALETTE.length]),
@@ -242,7 +263,7 @@ new ApexCharts(document.querySelector('#chartStatus'), {
     colors: statusPalette,
     stroke:{ width:0 },
     legend:{ position:'right', fontSize:'12px' },
-    plotOptions:{ pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}},
+    plotOptions:{ pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label: MC_WO_TR.chart_total }}}}},
     dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
 }).render();
 </script>
@@ -359,9 +380,9 @@ function renderBuildingPanel(b, idx, total) {
     const cats = b.work_orders_by_category || {};
     const catHtml = (windowKey) => {
         const entries = Object.entries(cats);
-        if (!entries.length) return `<div style="color:#94a3b8;font-size:13px;padding:.5rem 0;">No service distribution.</div>`;
+        if (!entries.length) return `<div style="color:#94a3b8;font-size:13px;padding:.5rem 0;">${MC_WO_TR.no_service_dist}</div>`;
         const sum = entries.reduce((s, [,v]) => s + Number(v[windowKey] || 0), 0);
-        if (!sum) return `<div style="color:#94a3b8;font-size:13px;padding:.5rem 0;">No work orders in this window.</div>`;
+        if (!sum) return `<div style="color:#94a3b8;font-size:13px;padding:.5rem 0;">${MC_WO_TR.no_wos_window}</div>`;
         return entries.map(([cat, v]) => {
             const val = Number(v[windowKey] || 0);
             const p = pct(val, sum);
@@ -373,38 +394,38 @@ function renderBuildingPanel(b, idx, total) {
 
     return `
         <div class="building-panel" data-idx="${idx}" style="display:${idx === 0 ? 'block' : 'none'}">
-            <h4>${escapeHtml(b.property_tag || 'Building')}</h4>
+            <h4>${escapeHtml(b.property_tag || MC_WO_TR.p_building_fallback)}</h4>
             <div class="meta">
-                <span>Type: ${escapeHtml(b.property_type || '—')}</span>
-                <span>Buildings: ${b.buildings_count ?? 0}</span>
+                <span>${MC_WO_TR.p_type}: ${escapeHtml(b.property_type || '—')}</span>
+                <span>${MC_WO_TR.p_buildings}: ${b.buildings_count ?? 0}</span>
                 ${b.location ? `<span>${escapeHtml(b.location)}</span>` : ''}
             </div>
             <div class="kpi-row">
-                <div class="kpi-box"><div class="v">${all.total}</div><div class="l">Total WOs</div></div>
-                <div class="kpi-box"><div class="v">${all.preventive}</div><div class="l">Preventive</div></div>
-                <div class="kpi-box"><div class="v">${all.reactive}</div><div class="l">Reactive</div></div>
+                <div class="kpi-box"><div class="v">${all.total}</div><div class="l">${MC_WO_TR.p_total_wos}</div></div>
+                <div class="kpi-box"><div class="v">${all.preventive}</div><div class="l">${MC_WO_TR.p_preventive}</div></div>
+                <div class="kpi-box"><div class="v">${all.reactive}</div><div class="l">${MC_WO_TR.p_reactive}</div></div>
             </div>
             <div class="tabs" data-tabs="${tabId}">
-                <button class="active" data-tab="all">All</button>
-                <button data-tab="d7">Last 7 Days</button>
-                <button data-tab="d30">Last 30 Days</button>
+                <button class="active" data-tab="all">${MC_WO_TR.tab_all}</button>
+                <button data-tab="d7">${MC_WO_TR.tab_7d}</button>
+                <button data-tab="d30">${MC_WO_TR.tab_30d}</button>
             </div>
             <div class="tab-panel active" data-panel="all">
-                <div class="cat-row"><span>PM / RM split</span><strong>${pct(all.preventive, all.total)}% / ${pct(all.reactive, all.total)}%</strong></div>
+                <div class="cat-row"><span>${MC_WO_TR.pm_rm_split}</span><strong>${pct(all.preventive, all.total)}% / ${pct(all.reactive, all.total)}%</strong></div>
                 ${catHtml('total')}
             </div>
             <div class="tab-panel" data-panel="d7">
-                <div class="cat-row"><span>PM / RM split</span><strong>${pct(d7.preventive, d7.total)}% / ${pct(d7.reactive, d7.total)}%</strong></div>
+                <div class="cat-row"><span>${MC_WO_TR.pm_rm_split}</span><strong>${pct(d7.preventive, d7.total)}% / ${pct(d7.reactive, d7.total)}%</strong></div>
                 ${catHtml('total_last_7_days')}
             </div>
             <div class="tab-panel" data-panel="d30">
-                <div class="cat-row"><span>PM / RM split</span><strong>${pct(d30.preventive, d30.total)}% / ${pct(d30.reactive, d30.total)}%</strong></div>
+                <div class="cat-row"><span>${MC_WO_TR.pm_rm_split}</span><strong>${pct(d30.preventive, d30.total)}% / ${pct(d30.reactive, d30.total)}%</strong></div>
                 ${catHtml('total_last_30_days')}
             </div>
             <div class="building-nav">
-                <button data-nav="prev" ${idx === 0 ? 'disabled' : ''}>&larr; Prev</button>
+                <button data-nav="prev" ${idx === 0 ? 'disabled' : ''}>${MC_WO_TR.nav_prev}</button>
                 <span>${idx + 1} / ${total}</span>
-                <button data-nav="next" ${idx === total - 1 ? 'disabled' : ''}>Next &rarr;</button>
+                <button data-nav="next" ${idx === total - 1 ? 'disabled' : ''}>${MC_WO_TR.nav_next}</button>
             </div>
         </div>
     `;

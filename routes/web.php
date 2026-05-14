@@ -3,6 +3,7 @@
 use App\Http\Controllers\AssetsDashboardController;
 use App\Http\Controllers\BillingDashboardController;
 use App\Http\Controllers\ContractsDashboardController;
+use App\Http\Controllers\DashboardBuilderController;
 use App\Http\Controllers\OverviewDashboardController;
 use App\Http\Controllers\ProjectDashboardController;
 use App\Http\Controllers\ProjectSelectController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\PropertiesDashboardController;
 use App\Http\Controllers\SyncStatusController;
 use App\Http\Controllers\UsersDashboardController;
 use App\Http\Controllers\MCDashboard2Controller;
+use App\Http\Controllers\MCFollowing2Controller;
 use App\Http\Controllers\MCFollowingDashboardController;
 use App\Http\Controllers\MCWorkordersDashboardController;
 use App\Http\Controllers\WorkOrdersDashboardController;
@@ -40,6 +42,19 @@ Route::get('/contracts',  [ContractsDashboardController::class, 'index']);
 Route::get('/mc-workorders', [MCWorkordersDashboardController::class, 'index'])->name('mc-workorders.dashboard');
 Route::get('/mc-following',  [MCFollowingDashboardController::class,  'index'])->name('mc-following.dashboard');
 Route::get('/mc-dashboard2', [MCDashboard2Controller::class,          'index'])->name('mc-dashboard2');
+Route::get('/mc-following2', [MCFollowing2Controller::class,          'index'])->name('mc-following2');
+
+Route::get('/dashboard-builder',          [DashboardBuilderController::class, 'select'])->name('dashboard.builder.select');
+Route::get('/dashboard-builder/{type}',   [DashboardBuilderController::class, 'index'])->name('dashboard.builder')->where('type', 'work-orders|properties|billing|users|assets|contracts|overview');
+Route::post('/dashboard-builder/{type}',  [DashboardBuilderController::class, 'save'])->name('dashboard.builder.save')->where('type', 'work-orders|properties|billing|users|assets|contracts|overview');
+Route::get('/dashboard-preview/{type}',   [DashboardBuilderController::class, 'preview'])->name('dashboard.preview')->where('type', 'work-orders|properties|billing|users|assets|contracts|overview');
+
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 Route::get('/opensearch/ping', function (Client $os) {
     return response()->json([

@@ -78,7 +78,7 @@
     .fmd-gauge-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; text-align:center; }
     .fmd-gauge-center .delta { font-size:.85rem; color:#16a34a; font-weight:600; }
     .fmd-gauge-center .delta.down { color:#dc2626; }
-    .fmd-gauge-center .v { font-size:1.3rem; font-weight:700; color:#dc2626; margin-top:.1rem; font-variant-numeric:tabular-nums; }
+    .fmd-gauge-center .v { font-size:1.3rem; font-weight:700; color:#0f172a; margin-top:.1rem; font-variant-numeric:tabular-nums; }
     .fmd-gauge-label { text-align:center; color:#64748b; font-size:12px; margin-top:-.5rem; }
 
     /* Map pin reuse */
@@ -97,7 +97,7 @@
             <h2>{{ __('mc_fm.heading') }}</h2>
             <div class="crumb"><a href="{{ url('/') }}">{{ __('mc_fm.crumb_dashboard') }}</a> &rsaquo; {{ __('mc_fm.crumb_fm') }}</div>
         </div>
-        <form method="GET" action="{{ url('/mc-dashboard2') }}" class="fmd-filters">
+        <form method="GET" action="{{ url('/mc-following2') }}" class="fmd-filters">
             <div class="fmd-fi">
                 <label>{{ __('mc_fm.f_from') }}</label>
                 <div class="fmd-date-wrap">
@@ -113,32 +113,32 @@
                 </div>
             </div>
             <div class="fmd-fi">
-                <label>{{ __('mc_fm.f_user') }}</label>
+                <label>{{ __('mc_follow.f_location') }}</label>
                 <div class="fmd-sel-wrap">
-                    <svg class="fi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <select name="user_id">
-                        <option value="">{{ __('mc_fm.opt_all_users') }}</option>
-                        @foreach($userOptions as $u)
-                            <option value="{{ $u->id }}" {{ ($filters['user_id'] ?? '') == $u->id ? 'selected' : '' }}>{{ $u->display_name }}</option>
+                    <svg class="fi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <select name="location_id">
+                        <option value="">{{ __('mc_follow.opt_all_locations') }}</option>
+                        @foreach($locationOptions as $loc)
+                            <option value="{{ $loc->id }}" {{ ($filters['location_id'] ?? '') == $loc->id ? 'selected' : '' }}>{{ $loc->building_name }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
             <div class="fmd-fi">
-                <label>{{ __('mc_fm.f_contract') }}</label>
+                <label>{{ __('mc_follow.f_user') }}</label>
                 <div class="fmd-sel-wrap">
-                    <svg class="fi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    <select name="contract_id">
-                        <option value="">{{ __('mc_fm.opt_all_contracts') }}</option>
-                        @foreach($contractOptions as $c)
-                            <option value="{{ $c->id }}" {{ ($filters['contract_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->display_name }}</option>
+                    <svg class="fi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <select name="user_id">
+                        <option value="">{{ __('mc_follow.opt_all_users') }}</option>
+                        @foreach($userOptions as $u)
+                            <option value="{{ $u->id }}" {{ ($filters['user_id'] ?? '') == $u->id ? 'selected' : '' }}>{{ $u->display_name }} — {{ $u->type_label }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
             <div class="fmd-fi" style="flex-direction:row;gap:.4rem;">
                 <button type="submit" class="btn btn-primary btn-sm">{{ __('mc_fm.apply') }}</button>
-                <a href="{{ url('/mc-dashboard2') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_fm.reset') }}</a>
+                <a href="{{ url('/mc-following2') }}" class="btn btn-sm btn-outline-secondary">{{ __('mc_fm.reset') }}</a>
             </div>
         </form>
     </div>
@@ -161,30 +161,22 @@
                 </div>
             </div>
 
-            <div class="fmd-card" style="padding:0;">
-                <div class="fmd-stat amber">
-                    <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                    </div>
-                    <div class="body"><div class="v">{{ number_format($totals['total']) }}</div><div class="l">{{ __('mc_fm.st_total_wo') }}</div></div>
-                </div>
-            </div>
-
-            <div class="fmd-card" style="padding:0;">
-                <div class="fmd-stat red">
-                    <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                    </div>
-                    <div class="body"><div class="v">{{ number_format($totals['reactive']) }}</div><div class="l">{{ __('mc_fm.st_reactive') }}</div></div>
-                </div>
-            </div>
-
+            {{-- Preventive following metrics (mirrors /mc-following totals) --}}
             <div class="fmd-card" style="padding:0;">
                 <div class="fmd-stat green">
                     <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
-                    <div class="body"><div class="v">{{ number_format($totals['preventive']) }}</div><div class="l">{{ __('mc_fm.st_preventive') }}</div></div>
+                    <div class="body"><div class="v">{{ number_format($closedWO) }}</div><div class="l">{{ __('mc_fm.st_closed_wo') }}</div></div>
+                </div>
+            </div>
+
+            <div class="fmd-card" style="padding:0;">
+                <div class="fmd-stat amber">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="body"><div class="v">{{ number_format($notClosedWO) }}</div><div class="l">{{ __('mc_fm.st_not_closed_wo') }}</div></div>
                 </div>
             </div>
 
@@ -192,11 +184,11 @@
                 <div class="fmd-gauge-wrap">
                     <div id="fmd_gauge"></div>
                     <div class="fmd-gauge-center">
-                        <div class="delta down">{{ $latePct }}%</div>
-                        <div class="v">{{ $lateLabel }}</div>
+                        <div class="delta">{{ number_format($completionPct, 1) }}%</div>
+                        <div class="v">{{ number_format($closedWO) }} / {{ number_format($closedWO + $notClosedWO) }}</div>
                     </div>
                 </div>
-                <div class="fmd-gauge-label">{{ __('mc_fm.gauge_label') }}</div>
+                <div class="fmd-gauge-label">{{ __('mc_fm.st_completion') }}</div>
             </div>
         </div>
 
@@ -229,36 +221,13 @@
         {{-- RIGHT --}}
         <div class="fmd-right">
             <div class="fmd-card fmd-bar-card">
-                <h6>{{ __('mc_fm.bar_title') }}</h6>
-                <div id="fmd_bar"></div>
+                <h6>{{ __('mc_follow.ch_status_line') }}</h6>
+                <div id="fmd_status_line"></div>
             </div>
 
             <div class="fmd-card">
-                <div class="fmd-donut-wrap">
-                    <div id="fmd_donut"></div>
-                    <div class="fmd-donut-center">
-                        <div class="v">{{ $expensesTotalFormatted }}</div>
-                        <div class="l">{{ __('mc_fm.total_exp') }}</div>
-                    </div>
-                </div>
-                <div class="title" style="margin-top:.75rem;">{{ __('mc_fm.donut_title') }}</div>
-                <div class="fmd-legend">
-                    @php $expPalette = ['#f59e0b','#9ca3af','#1e293b','#14b8a6','#6366f1']; @endphp
-                    @foreach($expensesByCategory as $i => $cat)
-                    @php
-                        $pct = $expensesTotal > 0 ? round(($cat->total / $expensesTotal) * 100) : 0;
-                        $val = $cat->total >= 1_000_000
-                            ? number_format($cat->total / 1_000_000, 2) . ' M'
-                            : ($cat->total >= 1_000 ? number_format($cat->total / 1_000, 1) . ' K' : number_format($cat->total, 0));
-                    @endphp
-                    <div class="row">
-                        <span class="dot" style="background:{{ $expPalette[$i] ?? '#64748b' }}"></span>
-                        <span class="name">{{ $cat->label }}</span>
-                        <span class="val">{{ $val }}</span>
-                        <span class="pct">({{ $pct }}%)</span>
-                    </div>
-                    @endforeach
-                </div>
+                <h6 style="margin:0 0 .5rem;font-weight:600;color:#0f172a;font-size:13px;">{{ __('mc_follow.ch_status_pie') }}</h6>
+                <div id="fmd_status_pie"></div>
             </div>
         </div>
 
@@ -268,46 +237,52 @@
 
 @section('scripts')
 <script>
-/* ------- Left: bar + donut ------- */
-const expPalette = ['#f59e0b','#9ca3af','#1e293b','#14b8a6','#6366f1'];
-const expCats    = @json($expensesByCategory);
+/* ------- Left: User Completion Status line + Status pie ------- */
+const statusColors = { 1:'#3b82f6', 2:'#f59e0b', 3:'#94a3b8', 4:'#22c55e', 5:'#ef4444', 6:'#6366f1', 7:'#ec4899', 8:'#8b5cf6' };
 
-new ApexCharts(document.querySelector('#fmd_bar'), {
-    chart: { type:'bar', height:170, toolbar:{show:false}, dir: IS_RTL ? 'rtl' : 'ltr' },
-    series: [{ name: @json(__('mc_fm.currency_sar')), data: expCats.map(c => ({ x: c.label, y: c.total })) }],
-    colors: expCats.map((_, i) => expPalette[i] ?? '#64748b'),
-    plotOptions:{ bar:{ distributed:true, borderRadius:4, columnWidth:'60%' } },
+/* Line: preventive WOs per status over time (same data as /mc-following) */
+const lineLabels = @json($months);
+const lineSeries = @json($lineSeries);
+
+new ApexCharts(document.querySelector('#fmd_status_line'), {
+    chart:{ type:'line', height:240, fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr' },
+    series: lineSeries.map(s => ({ name:s.name, data:s.data })),
+    xaxis:{ categories: lineLabels, labels:{ style:{ fontSize:'10px', colors:'#64748b' } }, axisBorder:{ show:false }, axisTicks:{ show:false } },
+    yaxis:{ labels:{ style:{ fontSize:'10px', colors:'#94a3b8' }, formatter: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v } },
+    stroke:{ curve:'smooth', width:2 },
+    colors: lineSeries.map(s => statusColors[s.status] || '#64748b'),
+    markers:{ size:3 },
     dataLabels:{ enabled:false },
-    legend:{ show:false },
-    xaxis:{ labels:{ style:{ fontSize:'11px', colors:'#64748b' }}, axisBorder:{show:false}, axisTicks:{show:false} },
-    yaxis:{ labels:{ style:{ fontSize:'10px', colors:'#94a3b8' }, formatter: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v }},
-    grid:{ borderColor:'#f1f5f9', strokeDashArray:4, yaxis:{lines:{show:true}}, xaxis:{lines:{show:false}} },
-    tooltip:{ theme:'light', y:{ formatter: v => new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v) } }
+    legend:{ position:'bottom', fontSize:'11px' },
+    grid:{ borderColor:'#f1f5f9', strokeDashArray:4 },
+    tooltip:{ theme:'light' },
 }).render();
 
-new ApexCharts(document.querySelector('#fmd_donut'), {
-    chart: { type:'donut', height:180, dir: IS_RTL ? 'rtl' : 'ltr' },
-    series: expCats.map(c => c.total),
-    labels: expCats.map(c => c.label),
-    colors: expCats.map((_, i) => expPalette[i] ?? '#64748b'),
+/* Pie: Completion Preventive Scheduled by Status (same data as /mc-following) */
+const pieRows = @json($perStatus);
+new ApexCharts(document.querySelector('#fmd_status_pie'), {
+    chart:{ type:'pie', height:260, fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr' },
+    series: pieRows.map(r => r.total),
+    labels: pieRows.map(r => r.label),
+    colors: pieRows.map(r => statusColors[r.status] || '#94a3b8'),
     stroke:{ width:0 },
-    legend:{ show:false },
-    dataLabels:{ enabled:false },
-    plotOptions:{ pie:{ donut:{ size:'72%', labels:{ show:false }}}}
+    legend:{ position:'bottom', fontSize:'11px' },
+    dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
+    tooltip:{ theme:'light' },
 }).render();
 
-/* ------- Right: gauge (radialBar) ------- */
+/* ------- Right: gauge (radialBar) — Completion % ------- */
 new ApexCharts(document.querySelector('#fmd_gauge'), {
     chart: { type:'radialBar', height:220, offsetY:-10, sparkline:{ enabled:true }, dir: IS_RTL ? 'rtl' : 'ltr' },
-    series: [{{ $latePct }}],
-    colors: ['#f97316'],
+    series: [{{ $completionPct }}],
+    colors: ['#10b981'],
     plotOptions:{ radialBar:{
         startAngle:-110, endAngle:110, hollow:{ size:'62%' },
-        track:{ background:'#fef3c7', strokeWidth:'100%' },
+        track:{ background:'#d1fae5', strokeWidth:'100%' },
         dataLabels:{ show:false }
     }},
     stroke:{ lineCap:'round' },
-    fill:{ type:'gradient', gradient:{ shade:'light', type:'horizontal', gradientToColors:['#dc2626'], stops:[0,100] } }
+    fill:{ type:'gradient', gradient:{ shade:'light', type:'horizontal', gradientToColors:['#059669'], stops:[0,100] } }
 }).render();
 </script>
 

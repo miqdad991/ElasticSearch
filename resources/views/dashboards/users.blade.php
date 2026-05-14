@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Users Dashboard')
+@section('title', __('users.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding: 1.25rem; border-radius: 12px; }
@@ -29,10 +29,10 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Users</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Headcount, roles, activation & project scope</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('users.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('users.subtitle') }}</p>
         </div>
-        <a href="{{ url('/users') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/users') }}" class="btn btn-sm btn-outline-secondary">{{ __('users.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
@@ -45,9 +45,9 @@
             ]; @endphp
             @foreach ($opts as $key => $values)
                 <div>
-                    <label>{{ str_replace('_',' ',$key) }}</label>
+                    <label>{{ __('users.f_' . $key) }}</label>
                     <select name="{{ $key }}">
-                        <option value="">— any —</option>
+                        <option value="">{{ __('users.any') }}</option>
                         @foreach ($values as $v)
                             <option value="{{ $v }}" @selected(($filters[$key] ?? null) == $v)>{{ $v }}</option>
                         @endforeach
@@ -55,33 +55,33 @@
                 </div>
             @endforeach
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('users.apply') }}</button>
     </form>
 
     <div class="grid-cards mb-3">
-        @php $i=0; @endphp
+        @php $i=0; $kpiTr = (array) __('users.kpi'); @endphp
         @foreach ($cards as $label => $value)
             @php $i++; @endphp
             <div class="card-soft kpi kpi-{{ $i }}">
-                <div class="kpi-label">{{ $label }}</div>
+                <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                 <div class="kpi-value">{{ number_format($value) }}</div>
             </div>
         @endforeach
     </div>
 
     <div class="grid-charts mb-3">
-        <div class="card-soft span-2"><h6>📈 Users onboarded per month</h6><div id="ch_monthly"></div></div>
-        <div class="card-soft"><h6>👥 By user type</h6><div id="ch_type"></div></div>
-        <div class="card-soft"><h6>🏙 By city</h6><div id="ch_city"></div></div>
-        <div class="card-soft span-2"><h6>📁 By project</h6><div id="ch_project"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('users.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft"><h6>{{ __('users.ch_type') }}</h6><div id="ch_type"></div></div>
+        <div class="card-soft"><h6>{{ __('users.ch_city') }}</h6><div id="ch_city"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('users.ch_project') }}</h6><div id="ch_project"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
-        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Latest 50 users</div>
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('users.tbl_title') }}</div>
         <div style="overflow-x:auto;">
             <table class="table table-sm mb-0">
                 <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                <tr>@foreach (['Name','Email','Phone','Type','City','Active','Created','Last login'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                <tr>@foreach ([__('users.col_name'),__('users.col_email'),__('users.col_phone'),__('users.col_type'),__('users.col_city'),__('users.col_active'),__('users.col_created'),__('users.col_last_login')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                 </thead>
                 <tbody>
                 @php
@@ -101,13 +101,13 @@
                         <td>{{ $r['phone'] ?? '—' }}</td>
                         <td><span class="pill" style="background:{{ $tc[0] }};color:{{ $tc[1] }};">{{ $r['user_type'] ?? '' }}</span></td>
                         <td>{{ $r['city_name'] ?? '—' }}</td>
-                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false)?'Active':'Inactive' }}</span></td>
+                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false) ? __('users.st_active') : __('users.st_inactive') }}</span></td>
                         <td>{{ \Illuminate\Support\Carbon::parse($r['created_at'])->format('Y-m-d') }}</td>
                         <td>{{ !empty($r['last_login_at']) ? \Illuminate\Support\Carbon::parse($r['last_login_at'])->format('Y-m-d H:i') : '—' }}</td>
                     </tr>
                 @endforeach
                 @if ($rows->isEmpty())
-                    <tr><td colspan="8" class="text-center text-muted py-4">No matching users.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">{{ __('users.empty') }}</td></tr>
                 @endif
                 </tbody>
             </table>
@@ -122,7 +122,7 @@ const charts = @json($charts);
 const PALETTE = ['#6366f1','#22c55e','#f59e0b','#ec4899','#14b8a6','#8b5cf6','#ef4444','#0ea5e9','#f97316','#10b981'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const baseChart = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });

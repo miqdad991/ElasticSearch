@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Billing Dashboard')
+@section('title', __('billing.page_title'))
 
 @section('styles')
     .page-bg { background: linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%); padding:1.25rem; border-radius:12px; }
@@ -26,10 +26,10 @@
 <div class="page-bg">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <div>
-            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">Billing &amp; Receivables</h2>
-            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">Lease/rent contracts, installments, aging & collections</p>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('billing.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('billing.subtitle') }}</p>
         </div>
-        <a href="{{ url('/billing') }}" class="btn btn-sm btn-outline-secondary">Reset filters</a>
+        <a href="{{ url('/billing') }}" class="btn btn-sm btn-outline-secondary">{{ __('billing.reset') }}</a>
     </div>
 
     <form method="get" class="card-soft mb-3">
@@ -41,9 +41,9 @@
             ]; @endphp
             @foreach ($opts as $key => $values)
                 <div>
-                    <label>{{ str_replace('_',' ',$key) }}</label>
+                    <label>{{ __('billing.f_' . $key) }}</label>
                     <select name="{{ $key }}">
-                        <option value="">— any —</option>
+                        <option value="">{{ __('billing.any') }}</option>
                         @foreach ($values as $v)
                             <option value="{{ $v }}" @selected(($filters[$key] ?? null) == $v)>{{ $v }}</option>
                         @endforeach
@@ -51,7 +51,7 @@
                 </div>
             @endforeach
         </div>
-        <button class="btn btn-primary btn-sm mt-3">Apply</button>
+        <button class="btn btn-primary btn-sm mt-3">{{ __('billing.apply') }}</button>
     </form>
 
     @php
@@ -61,11 +61,12 @@
             'row3' => ['Collected','Outstanding','Overdue Amount','Payment Due (contracts)'],
         ];
     @endphp
+    @php $kpiTr = (array) __('billing.kpi'); @endphp
     @foreach ($rows as $cls => $labels)
         <div class="grid-cards mb-3">
             @foreach ($labels as $label)
                 <div class="card-soft kpi {{ $cls }}">
-                    <div class="kpi-label">{{ $label }}</div>
+                    <div class="kpi-label">{{ $kpiTr[$label] ?? $label }}</div>
                     <div class="kpi-value">
                         {{ is_numeric($cards[$label]) ? number_format($cards[$label], str_contains($label,'Contracts')||$label==='Rent'||$label==='Lease'?0:2) : $cards[$label] }}
                     </div>
@@ -75,21 +76,21 @@
     @endforeach
 
     <div class="grid-charts mb-3">
-        <div class="card-soft span-2"><h6>📈 Collections vs Outstanding per month</h6><div id="ch_monthly"></div></div>
-        <div class="card-soft"><h6>⏳ Aging buckets</h6><div id="ch_aging"></div></div>
-        <div class="card-soft"><h6>📄 Contracts by type</h6><div id="ch_type"></div></div>
-        <div class="card-soft"><h6>🔌 Ejar sync status</h6><div id="ch_ejar"></div></div>
-        <div class="card-soft"><h6>💳 Payment methods</h6><div id="ch_ptype"></div></div>
-        <div class="card-soft span-2"><h6>🏆 Top 10 tenants by outstanding</h6><div id="ch_tenants"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('billing.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft"><h6>{{ __('billing.ch_aging') }}</h6><div id="ch_aging"></div></div>
+        <div class="card-soft"><h6>{{ __('billing.ch_type') }}</h6><div id="ch_type"></div></div>
+        <div class="card-soft"><h6>{{ __('billing.ch_ejar') }}</h6><div id="ch_ejar"></div></div>
+        <div class="card-soft"><h6>{{ __('billing.ch_ptype') }}</h6><div id="ch_ptype"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('billing.ch_tenants') }}</h6><div id="ch_tenants"></div></div>
     </div>
 
     <div class="grid-charts">
         <div class="card-soft" style="padding:0;overflow:hidden;">
-            <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Overdue installments</div>
+            <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('billing.tbl_overdue') }}</div>
             <div style="overflow-x:auto;">
                 <table class="table table-sm mb-0">
                     <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                    <tr>@foreach (['Ref','Contract','Type','Tenant','Due','Days','Amount'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                    <tr>@foreach ([__('billing.col_ref'),__('billing.col_contract'),__('billing.col_type'),__('billing.col_tenant'),__('billing.col_due'),__('billing.col_days'),__('billing.col_amount')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                     </thead>
                     <tbody>
                     @foreach ($overdueRows as $r)
@@ -103,18 +104,18 @@
                             <td class="text-right">{{ number_format($r['amount'] ?? 0, 2) }}</td>
                         </tr>
                     @endforeach
-                    @if ($overdueRows->isEmpty()) <tr><td colspan="7" class="text-center text-muted py-4">None.</td></tr> @endif
+                    @if ($overdueRows->isEmpty()) <tr><td colspan="7" class="text-center text-muted py-4">{{ __('billing.empty_none') }}</td></tr> @endif
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div class="card-soft" style="padding:0;overflow:hidden;">
-            <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">Upcoming installments</div>
+            <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('billing.tbl_upcoming') }}</div>
             <div style="overflow-x:auto;">
                 <table class="table table-sm mb-0">
                     <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
-                    <tr>@foreach (['Ref','Contract','Type','Tenant','Due','Amount'] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                    <tr>@foreach ([__('billing.col_ref'),__('billing.col_contract'),__('billing.col_type'),__('billing.col_tenant'),__('billing.col_due'),__('billing.col_amount')] as $h)<th>{{ $h }}</th>@endforeach</tr>
                     </thead>
                     <tbody>
                     @foreach ($upcomingRows as $r)
@@ -127,7 +128,7 @@
                             <td class="text-right">{{ number_format($r['amount'] ?? 0, 2) }}</td>
                         </tr>
                     @endforeach
-                    @if ($upcomingRows->isEmpty()) <tr><td colspan="6" class="text-center text-muted py-4">None.</td></tr> @endif
+                    @if ($upcomingRows->isEmpty()) <tr><td colspan="6" class="text-center text-muted py-4">{{ __('billing.empty_none') }}</td></tr> @endif
                     </tbody>
                 </table>
             </div>
@@ -142,7 +143,7 @@ const charts = @json($charts);
 const PALETTE = ['#6366f1','#10b981','#f59e0b','#ef4444','#06b6d4','#a855f7','#22c55e','#f97316','#ec4899','#14b8a6'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const base = (extra={}) => ({
-    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, ...extra.chart },
+    chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });
