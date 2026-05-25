@@ -115,7 +115,7 @@ Only needed if you seeded fake data or if the OpenSearch index gets out of sync.
 ```bash
 docker exec opensearch2-app php artisan os:reindex work_orders
 docker exec opensearch2-app php artisan os:reindex properties
-docker exec opensearch2-app php artisan os:reindex assets
+    docker exec opensearch2-app php artisan os:reindex assets
 docker exec opensearch2-app php artisan os:reindex users
 docker exec opensearch2-app php artisan os:reindex commercial_contracts
 docker exec opensearch2-app php artisan os:reindex installments

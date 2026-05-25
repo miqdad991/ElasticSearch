@@ -2,6 +2,7 @@
 
 namespace App\Services\Sync;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -35,29 +36,60 @@ class OsoolClient
             throw new \RuntimeException('OSOOL_HMAC_SECRET / DWH_HMAC_SECRET is not configured.');
         }
 
-        $path      = '/' . ltrim($path, '/');
-        $fullPath  = $query ? $path . '?' . http_build_query($query) : $path;
-        $url       = $this->baseUrl . $fullPath;
-        $timestamp = (string) time();
-        $bodyHash  = hash('sha256', '');
-        $payload   = implode("\n", ['GET', $timestamp, $fullPath, $bodyHash]);
-        $signature = hash_hmac('sha256', $payload, $this->secret);
+        $path     = '/' . ltrim($path, '/');
+        $fullPath = $query ? $path . '?' . http_build_query($query) : $path;
+        $url      = $this->baseUrl . $fullPath;
 
-        $response = Http::timeout($this->timeout)
-            ->retry($this->maxRetries, 500, throw: false)
-            ->withHeaders([
-                'Authorization' => 'HMAC ' . $signature,
-                'X-Timestamp'   => $timestamp,
-                'Accept'        => 'application/json',
-            ])
-            ->get($url);
+        $attempt = 0;
+        while (true) {
+            $attempt++;
+            // Re-sign every attempt: HMAC timestamp must be fresh after a long Retry-After wait.
+            $timestamp = (string) time();
+            $payload   = implode("\n", ['GET', $timestamp, $fullPath, hash('sha256', '')]);
+            $signature = hash_hmac('sha256', $payload, $this->secret);
 
-        if ($response->failed()) {
-            throw new \RuntimeException(
-                "Osool API {$response->status()} on {$fullPath}: " . mb_substr((string) $response->body(), 0, 300)
-            );
+            try {
+                $response = Http::timeout($this->timeout)
+                    ->withHeaders([
+                        'Authorization' => 'HMAC ' . $signature,
+                        'X-Timestamp'   => $timestamp,
+                        'Accept'        => 'application/json',
+                    ])
+                    ->get($url);
+            } catch (ConnectionException $e) {
+                if ($attempt > $this->maxRetries) throw $e;
+                sleep(min(30, 2 ** $attempt));
+                continue;
+            }
+
+            $status = $response->status();
+
+            if ($status === 429 && $attempt <= $this->maxRetries) {
+                sleep($this->parseRetryAfter($response->header('Retry-After')) ?? min(60, 2 ** $attempt));
+                continue;
+            }
+
+            if ($status >= 500 && $attempt <= $this->maxRetries) {
+                sleep(min(30, 2 ** $attempt));
+                continue;
+            }
+
+            if ($response->failed()) {
+                throw new \RuntimeException(
+                    "Osool API {$status} on {$fullPath}: " . mb_substr((string) $response->body(), 0, 300)
+                );
+            }
+
+            return (array) $response->json();
         }
+    }
 
-        return (array) $response->json();
+    private function parseRetryAfter(?string $header): ?int
+    {
+        if ($header === null || $header === '') return null;
+        if (ctype_digit(trim($header))) return max(1, (int) $header);
+        $when = strtotime($header);
+        if ($when === false) return null;
+        return max(1, $when - time());
     }
 }

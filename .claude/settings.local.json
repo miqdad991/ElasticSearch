@@ -46,7 +46,8 @@
       "Bash(curl -s \"http://localhost:8080/mc-following2\" -b /tmp/cookies.txt)",
       "Bash(grep -oE 'fmd-bar-card[^>]*>[^<]*<h6>[^<]+|id=\"fmd_status_line\"|id=\"fmd_bar\"|lineSeries\\\\s*=\\\\s*\\\\[[^]]{0,200}')",
       "Bash(grep -oE 'id=\"fmd_donut\"|id=\"fmd_status_pie\"|<h6[^>]*>[^<]+|pieRows\\\\s*=\\\\s*\\\\[[^]]{0,180}')",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(php *)"
     ]
   }
 }
