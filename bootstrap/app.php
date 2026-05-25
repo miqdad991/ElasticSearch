@@ -14,6 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
+
+        $middleware->alias([
+            'require.sso' => \App\Http\Middleware\RequireSso::class,
+        ]);
+
+        // Cross-app POST signed by HMAC, not by CSRF token.
+        $middleware->validateCsrfTokens(except: [
+            'sso/logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -71,38 +71,38 @@ Run in this order — each command pulls from the API, transforms into the marts
 
 ```bash
 # Stage 1 — Regions
-docker exec opensearch2-app php artisan sync:run regions
+sudo docker exec opensearch2-app php artisan sync:run regions
 
 # Stage 2 — Reference / lookup tables
-docker exec opensearch2-app php artisan sync:run cities
-docker exec opensearch2-app php artisan sync:run service-providers
-docker exec opensearch2-app php artisan sync:run users
-docker exec opensearch2-app php artisan sync:run projects-details
-docker exec opensearch2-app php artisan sync:run asset-statuses
-docker exec opensearch2-app php artisan sync:run contract-types
+sudo docker exec opensearch2-app php artisan sync:run cities
+sudo docker exec opensearch2-app php artisan sync:run service-providers
+sudo docker exec opensearch2-app php artisan sync:run users
+sudo docker exec opensearch2-app php artisan sync:run projects-details
+sudo docker exec opensearch2-app php artisan sync:run asset-statuses
+sudo docker exec opensearch2-app php artisan sync:run contract-types
 
 # Stage 3 — User–project links
-docker exec opensearch2-app php artisan sync:run user-projects
+sudo docker exec opensearch2-app php artisan sync:run user-projects
 
 # Stage 4 — Properties
-docker exec opensearch2-app php artisan sync:run properties
+sudo docker exec opensearch2-app php artisan sync:run properties
 
 # Stage 5 — Property children & asset metadata
-docker exec opensearch2-app php artisan sync:run property-buildings
-docker exec opensearch2-app php artisan sync:run asset-categories
-docker exec opensearch2-app php artisan sync:run asset-names
-docker exec opensearch2-app php artisan sync:run priorities
+sudo docker exec opensearch2-app php artisan sync:run property-buildings
+sudo docker exec opensearch2-app php artisan sync:run asset-categories
+sudo docker exec opensearch2-app php artisan sync:run asset-names
+sudo docker exec opensearch2-app php artisan sync:run priorities
 
 # Stage 6 — Transactional data (heaviest)
-docker exec opensearch2-app php artisan sync:run work-orders
-docker exec opensearch2-app php artisan sync:run assets
-docker exec opensearch2-app php artisan sync:run commercial-contracts
-docker exec opensearch2-app php artisan sync:run contracts
+sudo docker exec opensearch2-app php artisan sync:run work-orders
+sudo docker exec opensearch2-app php artisan sync:run assets
+sudo docker exec opensearch2-app php artisan sync:run commercial-contracts
+sudo docker exec opensearch2-app php artisan sync:run contracts
 
 # Stage 7 — Contract children
-docker exec opensearch2-app php artisan sync:run payment-details
-docker exec opensearch2-app php artisan sync:run contract-months
-docker exec opensearch2-app php artisan sync:run packages
+sudo docker exec opensearch2-app php artisan sync:run payment-details
+sudo docker exec opensearch2-app php artisan sync:run contract-months
+sudo docker exec opensearch2-app php artisan sync:run packages
 ```
 
 ---
@@ -118,9 +118,9 @@ docker exec opensearch2-app php artisan os:reindex properties
     docker exec opensearch2-app php artisan os:reindex assets
 docker exec opensearch2-app php artisan os:reindex users
 docker exec opensearch2-app php artisan os:reindex commercial_contracts
-docker exec opensearch2-app php artisan os:reindex installments
-docker exec opensearch2-app php artisan os:reindex contracts
-docker exec opensearch2-app php artisan os:reindex projects
+sudo docker exec opensearch2-app php artisan os:reindex installments
+sudo docker exec opensearch2-app php artisan os:reindex contracts
+sudo docker exec opensearch2-app php artisan os:reindex projects
 ```
 
 ---

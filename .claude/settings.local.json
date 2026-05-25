@@ -47,7 +47,28 @@
       "Bash(grep -oE 'fmd-bar-card[^>]*>[^<]*<h6>[^<]+|id=\"fmd_status_line\"|id=\"fmd_bar\"|lineSeries\\\\s*=\\\\s*\\\\[[^]]{0,200}')",
       "Bash(grep -oE 'id=\"fmd_donut\"|id=\"fmd_status_pie\"|<h6[^>]*>[^<]+|pieRows\\\\s*=\\\\s*\\\\[[^]]{0,180}')",
       "Bash(git checkout *)",
-      "Bash(php *)"
+      "Bash(php *)",
+      "Bash(ls \"C:\\\\\\\\xampp\\\\\\\\htdocs\\\\\\\\laravel\\\\\\\\Osool-B2G\")",
+      "Bash(Select-Object Name)",
+      "Bash(grep -nA1 -B1 \"'dashboard'\" \"C:/xampp/htdocs/laravel/Osool-B2G/resources/lang/en/slider.php\")",
+      "Bash(echo \"\")",
+      "Bash(echo \"# --- SSO \\(Osool ↔ Dashboard\\) ---\")",
+      "Bash(echo \"# Shared HMAC secret. Must match the dashboard's SSO_HMAC_SECRET exactly.\")",
+      "Bash(echo \"# Generate with: php -r \\\\\"echo bin2hex\\(random_bytes\\(32\\)\\);\\\\\"\")",
+      "Bash(echo \"SSO_HMAC_SECRET=\")",
+      "Bash(grep -nA2 \"ports:\" docker-compose.yml)",
+      "Bash(grep -nA2 \"ports:\" \"C:/xampp/htdocs/laravel/Osool-B2G/docker-compose.yml\")",
+      "Bash(curl -sI -m 3 http://127.0.0.1:8000)",
+      "Bash(curl -sI -m 3 http://localhost:8080)",
+      "Bash(docker exec *)",
+      "Bash(curl -s -o /dev/null -w \"from host: status=%{http_code}\\\\n\" -m 3 http://127.0.0.1:8000/)",
+      "Bash(curl -sI -m 5 http://localhost:8080/)",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code} time=%{time_total}s\\\\n\" -m 5 \"http://localhost:8080/sso/consume?token=eyJzdWIiOjIxLCJwaWQiOjIyOCwibGFuZyI6ImVuIiwiZXhwIjoxNzc5NzAxODY1LCJqdGkiOiIwMzFhYTdmZS0zY2E4LTQyNWEtODIzMy02MjcxY2RkOWU0YjAiLCJpc3MiOiJvc29vbCJ9.d5b51544ab7866efb93f7d365fc81c8c308cacb1d90f671cac4e6fd0240668a4\")",
+      "Bash(curl -sI -m 3 http://localhost:8080/)",
+      "Bash(curl -sI -m 3 http://127.0.0.1:8080/)",
+      "Bash(curl -sI -m 3 http://[::1]:8080/)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist *)"
     ]
   }
 }
