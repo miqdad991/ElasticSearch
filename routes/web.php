@@ -6,7 +6,6 @@ use App\Http\Controllers\ContractsDashboardController;
 use App\Http\Controllers\DashboardBuilderController;
 use App\Http\Controllers\OverviewDashboardController;
 use App\Http\Controllers\ProjectDashboardController;
-use App\Http\Controllers\ProjectSelectController;
 use App\Http\Controllers\PropertiesDashboardController;
 use App\Http\Controllers\SsoController;
 use App\Http\Controllers\SyncStatusController;
@@ -29,9 +28,6 @@ Route::middleware('require.sso')->group(function () {
     Route::get('/',          [OverviewDashboardController::class,  'index']);
     Route::get('/overview',  [OverviewDashboardController::class,  'index']);
 
-    Route::get('/select-project',               [ProjectSelectController::class, 'index']);
-    Route::post('/select-project/{projectId}',  [ProjectSelectController::class, 'select'])->whereNumber('projectId');
-    Route::post('/exit-project',                [ProjectSelectController::class, 'exit']);
     Route::get('/project-dashboard',            [ProjectDashboardController::class, 'index']);
 
     Route::get('/admin/sync-status',       [SyncStatusController::class, 'index']);

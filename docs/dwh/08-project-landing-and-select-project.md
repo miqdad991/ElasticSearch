@@ -6,28 +6,38 @@
 **Load cadence:** 30-min push from source → DWH APIs
 **Delete policy:** hard delete
 
-> Closes the loop on two UIs that the earlier docs only touched indirectly.
+> Closes the loop on the project-landing UI that the earlier docs only touched indirectly.
+
+> **Update:** the in-app `/select-project` screen has been removed. Project
+> selection now happens in the Osool platform and arrives over SSO as the `pid`
+> claim, which `SsoController` writes to `selected_project_id` in the session.
+> The data-warehouse model below is unchanged; only the in-app picker is gone.
 
 ---
 
 ## 1. Dashboard summary
 
 Covered UIs:
-- **`/select-project`** — lists all projects the logged-in admin can enter. Picking one stores `selected_project_id` in the session and unlocks every project-scoped dashboard.
+- **Project selection (via Osool SSO)** — the chosen project arrives as the SSO `pid` claim and is stored as `selected_project_id` in the session, unlocking every project-scoped dashboard. (Formerly an in-app `/select-project` page; now read-only here.)
 - **`/project-dashboard`** — the per-project landing page. Shows project info, asset categories tied to this project's users, priorities tied to this project's users, project users table, financial overview, and the top overview cards (Total Assets, Total Work Orders, Total Budget, Total Contracts).
 
 ---
 
 ## 2. UI inventory
 
-### 2.1 `/select-project`
+### 2.1 Project selection (via Osool SSO)
 
-**Table columns per project row:** project name, owner, industry, contract window, status, property count, service-provider count, contract value, payment due, payment overdue, module flags.
+> The in-app picker described here has been removed. The selected project now
+> arrives over SSO (`pid` claim → `selected_project_id`). The rollup data below
+> is retained because the Overview dashboard still surfaces it; it is no longer
+> backing a selection screen.
+
+**Per-project rollup fields:** project name, owner, industry, contract window, status, property count, service-provider count, contract value, payment due, payment overdue, module flags.
 
 All of this is already produced by `reports.mv_project_rollup` (doc #7).
-**No new schema, no new ETL, no new endpoints.** The screen is a sorted, filterable read of that mv plus a button that writes `selected_project_id` to the user's session.
+**No new schema, no new ETL, no new endpoints.**
 
-Access control: `dim_user.user_type IN ('super_admin','osool_admin','admin','admin_employee')` see every project; all other user types see only projects where `bridge_user_project.user_id = :me`.
+Access control for project scoping is enforced upstream in Osool and reflected in the SSO `pid` claim; this app does not present a project list of its own.
 
 ### 2.2 `/project-dashboard` landing
 
@@ -312,7 +322,7 @@ POST /api/dwh/ingest/priorities       -- already listed in earlier docs; payload
 POST /api/dwh/ingest/asset-categories -- same
 ```
 
-No dedicated endpoint is needed for `/select-project` or `/project-dashboard` landing — they read the warehouse, they don't write to it.
+No dedicated endpoint is needed for project selection or `/project-dashboard` landing — they read the warehouse, they don't write to it.
 
 ---
 
@@ -353,7 +363,7 @@ Operational alerts:
 1. Some `priorities.user_id` rows are NULL — they represent system defaults. Should the tag cloud show them as "Global" priorities on every project, or hide them? Current SQL hides them; confirm.
 2. Should `dim_asset_category` dedupe on `(owner_user_id, asset_category)` (name-level) or stay at `id` level? Source has duplicates with the same name per user. Current: stay at id level; dashboard deduplicates by name on render.
 3. `mv_project_landing.approved_payrolls` counts payrolls against execution contracts only. Is that the intended scope, or should lease-side commercial-contract payrolls count too? (Source doesn't have those; safe to leave as-is.)
-4. `/select-project` access-control rule — confirm the list above (`super_admin`, `osool_admin`, `admin`, `admin_employee`) sees everything, everyone else is scoped. This needs to match Laravel app behavior today.
+4. Project access-control rule — scoping is now decided in Osool and conveyed via the SSO `pid` claim. Confirm the upstream rule (`super_admin`, `osool_admin`, `admin`, `admin_employee` see everything, everyone else scoped) still matches what Osool emits.
 5. Should the financial overview cards on the landing page also include execution contracts (`dim_contract.contract_value`) not just `commercial_contracts.amount`? Currently no — lease money only. The per-project Contracts tab (doc #6) covers execution.
 
 ---
@@ -375,6 +385,6 @@ Saved as `docs/dwh/08-project-landing-and-select-project.md`.
 | 5 | Billing / Lease (global + per-project) | 05 |
 | 6 | Contracts (global + per-project + detail) | 06 |
 | 7 | Overview | 07 |
-| 8 | Select Project + Project Landing | 08 |
+| 8 | Project Landing (selection via Osool SSO) | 08 |
 
 All dashboards in the current Laravel app are now covered. Every migration, every ingest endpoint, every materialized view the DWH needs is specified.

@@ -9,7 +9,6 @@ return [
 
     // Nav items
     'overview'          => 'نظرة عامة',
-    'select_project'    => 'اختيار المشروع',
     'sync_status'       => 'حالة المزامنة',
     'work_orders'       => 'أوامر العمل',
     'properties'        => 'العقارات',
@@ -25,6 +24,6 @@ return [
 
     // Header
     'live'              => 'مباشر',
-    'exit_project'      => '✕',
     'lang_label'        => 'EN',
+    'current_project'   => 'المشروع الحالي',
 ];

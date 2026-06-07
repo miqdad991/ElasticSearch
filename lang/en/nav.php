@@ -9,7 +9,6 @@ return [
 
     // Nav items
     'overview'          => 'Overview',
-    'select_project'    => 'Select Project',
     'sync_status'       => 'Sync Status',
     'work_orders'       => 'Work Orders',
     'properties'        => 'Properties',
@@ -25,6 +24,6 @@ return [
 
     // Header
     'live'              => 'Live',
-    'exit_project'      => '✕',
     'lang_label'        => 'AR',
+    'current_project'   => 'Current Project',
 ];

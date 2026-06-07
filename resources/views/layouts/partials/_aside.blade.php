@@ -9,12 +9,6 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url('/select-project') }}" class="{{ request()->is('select-project*') ? 'active' : '' }}">
-                    <span data-feather="folder" class="nav-icon"></span>
-                    <span class="menu-text">{{ __('nav.select_project') }}</span>
-                </a>
-            </li>
-            <li>
                 <a href="{{ url('/admin/sync-status') }}" class="{{ request()->is('admin/sync-status*') ? 'active' : '' }}">
                     <span data-feather="activity" class="nav-icon"></span>
                     <span class="menu-text">{{ __('nav.sync_status') }}</span>

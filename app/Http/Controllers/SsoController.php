@@ -50,8 +50,8 @@ class SsoController extends Controller
         $request->session()->put('locale', in_array($locale, ['en', 'ar'], true) ? $locale : 'en');
 
         if ($projectId) {
-            // Mirror the shape ProjectSelectController writes — other
-            // dashboards read both keys.
+            // The selected project comes only from Osool's SSO claims.
+            // Dashboards read both keys (id + name).
             $name = DB::table('marts.dim_project')
                 ->where('project_id', $projectId)
                 ->value('project_name');

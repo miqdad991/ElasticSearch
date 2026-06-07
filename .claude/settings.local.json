@@ -68,7 +68,10 @@
       "Bash(curl -sI -m 3 http://127.0.0.1:8080/)",
       "Bash(curl -sI -m 3 http://[::1]:8080/)",
       "Bash(netstat -ano)",
-      "Bash(tasklist *)"
+      "Bash(tasklist *)",
+      "Bash(git rm *)",
+      "Bash(rm -f -- nul)",
+      "Bash(cmd.exe /c \"if exist nul echo STILL_EXISTS\")"
     ]
   }
 }

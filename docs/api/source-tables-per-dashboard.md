@@ -295,9 +295,10 @@ projects_details pd
 
 ---
 
-## 8. Project Selector + Project Landing
+## 8. Project Landing
 
-Covers `/select-project` and `/project-dashboard` (landing, not tabs).
+Covers `/project-dashboard` (landing, not tabs). Project selection itself is no
+longer an in-app screen — it arrives over SSO as the `pid` claim.
 
 ### Tables
 

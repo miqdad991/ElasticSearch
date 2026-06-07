@@ -56,10 +56,6 @@
                     @endif
                 </div>
             </div>
-            <form method="post" action="{{ url('/exit-project') }}">
-                @csrf
-                <button class="btn btn-light btn-sm" style="font-weight:600;">✕ Exit Project</button>
-            </form>
         </div>
     </div>
 

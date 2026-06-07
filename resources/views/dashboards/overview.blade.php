@@ -58,9 +58,20 @@
 <div class="page-bg">
 
     {{-- Page title --}}
-    <div style="margin-bottom:1rem;">
-        <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('overview.heading') }}</h2>
-        <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('overview.subtitle') }}</p>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <div>
+            <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('overview.heading') }}</h2>
+            <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('overview.subtitle') }}</p>
+        </div>
+
+        {{-- Current project (read-only — changed only from Osool via SSO) --}}
+        @if (session('selected_project_id'))
+            <div style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff;padding:.4rem .9rem;border-radius:9999px;font-size:13px;font-weight:600;box-shadow:0 4px 12px -4px rgba(99,102,241,.5);">
+                <span data-feather="briefcase" style="width:15px;height:15px;"></span>
+                <span style="opacity:.8;font-weight:500;">{{ __('nav.current_project') }}:</span>
+                <span>{{ session('selected_project_name') }}</span>
+            </div>
+        @endif
     </div>
 
     {{-- ── Platform KPI strip ──────────────────────────────────────── --}}

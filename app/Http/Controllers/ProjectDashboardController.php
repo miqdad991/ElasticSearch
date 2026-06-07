@@ -11,7 +11,7 @@ class ProjectDashboardController extends Controller
     public function index()
     {
         $projectId = session('selected_project_id');
-        if (!$projectId) return redirect('/select-project');
+        if (!$projectId) return redirect('/');
 
         $prefix = config('opensearch.index_prefix', 'osool_');
 
@@ -20,7 +20,7 @@ class ProjectDashboardController extends Controller
             $project = $this->os->get(['index' => $prefix . 'projects', 'id' => $projectId])['_source'] ?? null;
         } catch (\Throwable) {
             session()->forget(['selected_project_id', 'selected_project_name']);
-            return redirect('/select-project');
+            return redirect('/');
         }
 
         $count = fn (string $entity, array $filter) => $this->os->count([
