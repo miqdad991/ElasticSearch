@@ -97,7 +97,7 @@
                 @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
-                    <div class="kpi-label">{{ $opt['label'] }}</div>
+                    <div class="kpi-label">{{ __('builder.kpi_con_' . $kpiKey) }}</div>
                     <div class="kpi-value">{{ $fmtVal }}</div>
                 </div>
             @endif
@@ -235,7 +235,7 @@ function makeHBar(el, labels, values, height, palette) {
     new ApexCharts(el, {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height || Math.max(280, labels.length * 36) },
-        series:[{ name:'Value', data: values }],
+        series:[{ name:'{{ __('builder.th_value') }}', data: values }],
         xaxis:{ categories: labels, labels:{ style:{ fontSize:'11px' }}},
         plotOptions:{ bar:{ horizontal:true, borderRadius:5, barHeight:'65%', distributed:true }},
         colors: (palette || PALETTE).slice(0, labels.length),
@@ -251,7 +251,7 @@ function makePieDonut(el, labels, values, type, height) {
         colors: PALETTE.slice(0, labels.length),
         stroke:{ width: type === 'donut' ? 0 : 2 },
         legend:{ position:'bottom', fontSize:'12px' },
-        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
         dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
     }).render();
 }

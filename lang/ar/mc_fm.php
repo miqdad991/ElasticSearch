@@ -43,4 +43,6 @@ return [
     // JS
     'currency_sar' => 'ر.س',
     'na'           => 'غير متوفر',
+
+    'moc_logo_alt' => 'وزارة الثقافة',
 ];

@@ -69,10 +69,10 @@
             <div class="filter-group">
                 <label>{{ __('builder.filter_ejar_status') }}</label>
                 <select name="ejar_sync_status">
-                    <option value="">All Statuses</option>
+                    <option value="">{{ __('builder.filter_all_statuses') }}</option>
                     @foreach(['synced_successfully','pending_sync','failed_sync','not_synced'] as $s)
                         <option value="{{ $s }}" {{ ($filters['ejar_sync_status'] ?? '') === $s ? 'selected' : '' }}>
-                            {{ ucwords(str_replace('_', ' ', $s)) }}
+                            {{ __('builder.ejar_' . $s) }}
                         </option>
                     @endforeach
                 </select>
@@ -99,7 +99,7 @@
                 @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
-                    <div class="kpi-label">{{ $opt['label'] }}</div>
+                    <div class="kpi-label">{{ __('builder.kpi_bill_' . $kpiKey) }}</div>
                     <div class="kpi-value">{{ $fmtVal }}</div>
                 </div>
             @endif
@@ -277,7 +277,7 @@ function makePieDonut(el, labels, values, type, height) {
         colors: PALETTE.slice(0, labels.length),
         stroke:{ width: type === 'donut' ? 0 : 2 },
         legend:{ position:'bottom', fontSize:'12px' },
-        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
         dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
     }).render();
 }
@@ -286,7 +286,7 @@ function makeBar(el, labels, values, height, horizontal, seriesName, tooltipFmt)
     const opts = {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height || 280 },
-        series:[{ name: seriesName || 'Count', data: values }],
+        series:[{ name: seriesName || '{{ __('builder.js_count') }}', data: values }],
         xaxis:{ categories: labels, labels:{ style:{ fontSize:'11px' }}},
         plotOptions:{ bar:{ horizontal: !!horizontal, borderRadius:5, barHeight: horizontal ? '65%' : undefined, distributed:true }},
         colors: PALETTE, legend:{ show:false },
@@ -305,8 +305,8 @@ function makeBar(el, labels, values, height, horizontal, seriesName, tooltipFmt)
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', stacked:true, height:300 },
         series:[
-            { name:'Collected',   data: data.map(d => d.paid)   },
-            { name:'Outstanding', data: data.map(d => d.unpaid) },
+            { name:'{{ __('builder.kpi_bill_collected') }}',   data: data.map(d => d.paid)   },
+            { name:'{{ __('builder.kpi_bill_outstanding') }}', data: data.map(d => d.unpaid) },
         ],
         xaxis:{ categories: data.map(d => d.label) },
         colors:['#10b981','#ef4444'],
@@ -390,7 +390,7 @@ function makeBar(el, labels, values, height, horizontal, seriesName, tooltipFmt)
     const data   = @json($chartData['top_tenants']);
     const labels = data.map(r => r.label);
     const values = data.map(r => r.amount);
-    makeBar(el, labels, values, Math.max(280, labels.length * 36), true, 'Outstanding', fmtCurrency);
+    makeBar(el, labels, values, Math.max(280, labels.length * 36), true, '{{ __('builder.kpi_bill_outstanding') }}', fmtCurrency);
 })();
 @endif
 @endif

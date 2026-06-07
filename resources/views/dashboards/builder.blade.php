@@ -77,7 +77,14 @@
 <div class="page-bg">
 
     {{-- Header --}}
-    @php $typeSlug = str_replace('-', '_', $type); @endphp
+    @php
+        $typeSlug = str_replace('-', '_', $type);
+        // Maps the route type to the abbreviated lang-key prefix used by kpi_* / chart_opt_*.
+        $kpiPrefix = [
+            'work-orders' => 'wo', 'properties' => 'prop', 'billing' => 'bill',
+            'users' => 'users', 'assets' => 'assets', 'contracts' => 'con', 'overview' => 'ov',
+        ][$type] ?? 'wo';
+    @endphp
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;">
         <div>
             <a href="{{ route('dashboard.builder.select') }}" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600;">{{ __('builder.back_to_types') }}</a>
@@ -120,7 +127,7 @@
                                style="border-left-color:{{ $opt['color'] }};"
                                data-kpi-card>
                             <input type="checkbox" name="kpis[]" value="{{ $key }}" {{ $isChecked ? 'checked' : '' }}>
-                            <div class="kpi-name">{{ $opt['label'] }}</div>
+                            <div class="kpi-name">{{ __("builder.kpi_{$kpiPrefix}_{$key}") }}</div>
                             <div class="kpi-check"></div>
                         </label>
                     @endforeach
@@ -147,7 +154,7 @@
                                        data-chart-toggle>
                                 <span class="bld-toggle-slider"></span>
                             </label>
-                            <span class="chart-name">{{ $opt['label'] }}</span>
+                            <span class="chart-name">{{ __("builder.chart_opt_{$kpiPrefix}_{$key}") }}</span>
                             @if(count($opt['types']) > 1)
                                 <div class="type-pills">
                                     @foreach($opt['types'] as $type)
@@ -157,13 +164,13 @@
                                                    id="type_{{ $key }}_{{ $type }}"
                                                    value="{{ $type }}"
                                                    {{ $selType === $type ? 'checked' : '' }}>
-                                            <label for="type_{{ $key }}_{{ $type }}">{{ $type }}</label>
+                                            <label for="type_{{ $key }}_{{ $type }}">{{ __('builder.ctype_' . $type) }}</label>
                                         </div>
                                     @endforeach
                                 </div>
                             @else
                                 <input type="hidden" name="charts_{{ $key }}_type" value="{{ $opt['types'][0] }}">
-                                <span style="font-size:11px;color:#94a3b8;padding:.2rem .55rem;border:1.5px solid #f1f5f9;border-radius:999px;">{{ $opt['types'][0] }}</span>
+                                <span style="font-size:11px;color:#94a3b8;padding:.2rem .55rem;border:1.5px solid #f1f5f9;border-radius:999px;">{{ __('builder.ctype_' . $opt['types'][0]) }}</span>
                             @endif
                         </div>
                     @endforeach

@@ -96,7 +96,7 @@
                 @php $opt = $usersKpiOptions[$kpiKey]; @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
-                    <div class="kpi-label">{{ $opt['label'] }}</div>
+                    <div class="kpi-label">{{ __('builder.kpi_users_' . $kpiKey) }}</div>
                     <div class="kpi-value">{{ number_format($kpiValues[$kpiKey] ?? 0) }}</div>
                 </div>
             @endif
@@ -233,7 +233,7 @@ function makePieDonut(el, labels, values, type, height) {
         colors: PALETTE.slice(0, labels.length),
         stroke:{ width: type === 'donut' ? 0 : 2 },
         legend:{ position:'bottom', fontSize:'12px' },
-        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
         dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
     }).render();
 }
@@ -242,7 +242,7 @@ function makeBar(el, labels, values, height, horizontal) {
     new ApexCharts(el, {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height || 300 },
-        series:[{ name:'Count', data: values }],
+        series:[{ name:'{{ __('builder.js_count') }}', data: values }],
         xaxis:{ categories: labels, labels:{ style:{ fontSize:'11px' }}},
         plotOptions:{ bar:{ horizontal: !!horizontal, borderRadius:5, barHeight: horizontal ? '65%' : undefined, distributed:true }},
         colors: PALETTE, legend:{ show:false },
@@ -264,7 +264,7 @@ function makeBar(el, labels, values, height, horizontal) {
         new ApexCharts(el, {
             ...baseOpts,
             chart:{ ...baseOpts.chart, type: type, height: 300 },
-            series:[{ name:'Users', data: values }],
+            series:[{ name:'{{ __('builder.type_users') }}', data: values }],
             xaxis:{ categories: labels },
             stroke:{ curve:'smooth', width: type === 'area' ? 3 : 2 },
             fill: type === 'area' ? { type:'gradient', gradient:{ opacityFrom:.45, opacityTo:.05 }} : {},

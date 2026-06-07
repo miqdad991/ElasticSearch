@@ -150,7 +150,7 @@ const base = (extra={}) => ({
 });
 const hbar = (id, data, palette) => new ApexCharts(document.querySelector(id), base({
     chart:{ type:'bar', height: Math.max(260, data.length*36) },
-    series:[{ name:'Value', data: data.map(d=>d.count) }],
+    series:[{ name:'{{ __('builder.js_value') }}', data: data.map(d=>d.count) }],
     xaxis:{ categories: data.map(d=>d.label) },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
     colors: data.map((_,i)=>(palette||PALETTE)[i%(palette||PALETTE).length]),

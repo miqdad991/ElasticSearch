@@ -136,7 +136,7 @@ const baseChart = (extra={}) => ({
 });
 new ApexCharts(document.querySelector('#ch_monthly'), baseChart({
     chart:{ type:'area', height:280 },
-    series:[{ name:'Work Orders', data: charts.monthly.map(d=>d.count) }],
+    series:[{ name:'{{ __('wo.heading') }}', data: charts.monthly.map(d=>d.count) }],
     xaxis:{ categories: charts.monthly.map(d=>d.label) },
     stroke:{ curve:'smooth', width:3, colors:['#6366f1'] },
     fill:{ type:'gradient', gradient:{ opacityFrom:.45, opacityTo:.05 } },
@@ -144,7 +144,7 @@ new ApexCharts(document.querySelector('#ch_monthly'), baseChart({
 })).render();
 const verticalBar = (id, data, palette) => new ApexCharts(document.querySelector(id), baseChart({
     chart:{ type:'bar', height:260 },
-    series:[{ name:'Count', data: data.map(d=>d.count) }],
+    series:[{ name:'{{ __('builder.js_count') }}', data: data.map(d=>d.count) }],
     xaxis:{ categories: data.map(d=>d.label), labels:{ rotate:-25 } },
     plotOptions:{ bar:{ borderRadius:6, columnWidth:'55%', distributed:true } },
     colors: data.map((_,i)=>(palette||PALETTE)[i%(palette||PALETTE).length]),
@@ -152,7 +152,7 @@ const verticalBar = (id, data, palette) => new ApexCharts(document.querySelector
 })).render();
 const horizontalBar = (id, data) => new ApexCharts(document.querySelector(id), baseChart({
     chart:{ type:'bar', height: Math.max(260, data.length*36) },
-    series:[{ name:'Count', data: data.map(d=>d.count) }],
+    series:[{ name:'{{ __('builder.js_count') }}', data: data.map(d=>d.count) }],
     xaxis:{ categories: data.map(d=>d.label) },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
     colors: data.map((_,i)=>PALETTE[i%PALETTE.length]),
@@ -163,7 +163,7 @@ const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), 
     series: data.map(d=>d.count), labels: data.map(d=>d.label),
     colors: palette || PALETTE, stroke:{ width:0 },
     legend:{ position:'bottom', fontSize:'12px' },
-    plotOptions:{ pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'Total' } } } } },
+    plotOptions:{ pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' } } } } },
     dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
 })).render();
 donut('#ch_service',  charts.by_service,  ['#f97316','#14b8a6']);

@@ -150,8 +150,8 @@ const base = (extra={}) => ({
 new ApexCharts(document.querySelector('#ch_monthly'), base({
     chart:{ type:'bar', stacked:true, height:300 },
     series:[
-        { name:'Collected',   data: charts.monthly.map(d=>d.paid) },
-        { name:'Outstanding', data: charts.monthly.map(d=>d.unpaid) },
+        { name:'{{ __('billing.kpi.Collected') }}',   data: charts.monthly.map(d=>d.paid) },
+        { name:'{{ __('billing.kpi.Outstanding') }}', data: charts.monthly.map(d=>d.unpaid) },
     ],
     xaxis:{ categories: charts.monthly.map(d=>d.label) },
     colors:['#10b981','#ef4444'],
@@ -163,12 +163,12 @@ const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), 
     series: data.map(d=>d.count), labels: data.map(d=>d.label),
     colors: palette || PALETTE, stroke:{ width:0 },
     legend:{ position:'bottom' },
-    plotOptions:{ pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' } } } } },
+    plotOptions:{ pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' } } } } },
     dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
 })).render();
 const vbar = (id, data, palette) => new ApexCharts(document.querySelector(id), base({
     chart:{ type:'bar', height:260 },
-    series:[{ name:'Value', data: data.map(d=>d.count) }],
+    series:[{ name:'{{ __('builder.js_value') }}', data: data.map(d=>d.count) }],
     xaxis:{ categories: data.map(d=>d.label), labels:{ rotate:-25 } },
     plotOptions:{ bar:{ borderRadius:6, columnWidth:'55%', distributed:true } },
     colors: data.map((_,i)=>(palette||PALETTE)[i%(palette||PALETTE).length]),
@@ -176,7 +176,7 @@ const vbar = (id, data, palette) => new ApexCharts(document.querySelector(id), b
 })).render();
 const hbar = (id, data) => new ApexCharts(document.querySelector(id), base({
     chart:{ type:'bar', height: Math.max(260, data.length*36) },
-    series:[{ name:'Value', data: data.map(d=>d.count) }],
+    series:[{ name:'{{ __('builder.js_value') }}', data: data.map(d=>d.count) }],
     xaxis:{ categories: data.map(d=>d.label) },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
     colors: data.map((_,i)=>PALETTE[i%PALETTE.length]),

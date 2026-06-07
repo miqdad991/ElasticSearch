@@ -58,4 +58,6 @@ return [
     'nav_prev'      => '→ السابق',
     'nav_next'      => 'التالي ←',
     'p_building_fallback' => 'مبنى',
+    'close'         => 'إغلاق',
+    'na'            => 'غير متوفر',
 ];

@@ -96,6 +96,26 @@ return [
     'apply'                   => 'Apply',
     'reset'                   => 'Reset',
 
+    // ── Chart series labels (JS) ─────────────────────────────────────────────
+    'js_count'                => 'Count',
+    'js_total'                => 'Total',
+    'js_value'                => 'Value',
+
+    // ── Chart type pills ─────────────────────────────────────────────────────
+    'ctype_line'              => 'Line',
+    'ctype_bar'               => 'Bar',
+    'ctype_area'              => 'Area',
+    'ctype_donut'             => 'Donut',
+    'ctype_pie'               => 'Pie',
+    'ctype_table'             => 'Table',
+    'ctype_stacked_bar'       => 'Stacked Bar',
+
+    // ── Ejar sync status options ─────────────────────────────────────────────
+    'ejar_synced_successfully'=> 'Synced Successfully',
+    'ejar_pending_sync'       => 'Pending Sync',
+    'ejar_failed_sync'        => 'Failed Sync',
+    'ejar_not_synced'         => 'Not Synced',
+
     // ── Filters ───────────────────────────────────────────────────────────────
     'filter_from'             => 'From',
     'filter_to'               => 'To',

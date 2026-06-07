@@ -58,4 +58,6 @@ return [
     'nav_prev'      => '← Prev',
     'nav_next'      => 'Next →',
     'p_building_fallback' => 'Building',
+    'close'         => 'Close',
+    'na'            => 'N/A',
 ];

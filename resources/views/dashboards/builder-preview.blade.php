@@ -108,7 +108,7 @@
                 @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
-                    <div class="kpi-label">{{ $opt['label'] }}</div>
+                    <div class="kpi-label">{{ __('builder.kpi_wo_' . $kpiKey) }}</div>
                     <div class="kpi-value">{{ $fmtVal }}</div>
                 </div>
             @endif
@@ -281,7 +281,7 @@ function makePieDonut(el, labels, values, type, height) {
         colors: PALETTE.slice(0, labels.length),
         stroke:{ width: type === 'donut' ? 0 : 2 },
         legend:{ position:'bottom', fontSize:'12px' },
-        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
         dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
     }).render();
 }
@@ -292,7 +292,7 @@ function makeBar(el, labels, values, height, horizontal) {
     new ApexCharts(el, {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height },
-        series:[{ name:'Count', data: values }],
+        series:[{ name:'{{ __('builder.js_count') }}', data: values }],
         xaxis:{ categories: labels },
         plotOptions:{ bar:{ horizontal: horizontal, borderRadius:5, barHeight: horizontal ? '70%' : undefined, distributed:true }},
         colors: PALETTE,
@@ -306,7 +306,7 @@ function makeBarCost(el, labels, values, height, horizontal) {
     new ApexCharts(el, {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height },
-        series:[{ name:'Total Cost', data: values }],
+        series:[{ name:'{{ __('builder.th_total_cost') }}', data: values }],
         xaxis:{ categories: labels },
         plotOptions:{ bar:{ horizontal: horizontal, borderRadius:5, barHeight: horizontal ? '70%' : undefined, distributed:true }},
         colors: PALETTE,
@@ -333,7 +333,7 @@ function makeBarCost(el, labels, values, height, horizontal) {
         new ApexCharts(el, {
             ...baseOpts,
             chart:{ ...baseOpts.chart, type: type, height: 300 },
-            series:[{ name:'Work Orders', data: values }],
+            series:[{ name:'{{ __('builder.th_work_orders') }}', data: values }],
             xaxis:{ categories: labels },
             stroke:{ curve:'smooth', width:2 },
             fill: type === 'area' ? { type:'gradient', gradient:{ shadeIntensity:.6, opacityFrom:.4, opacityTo:.05 }} : {},
@@ -502,7 +502,7 @@ function makeBarCost(el, labels, values, height, horizontal) {
             colors: PALETTE.slice(0, labels.length),
             stroke:{ width: type === 'donut' ? 0 : 2 },
             legend:{ position:'bottom', fontSize:'12px' },
-            plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+            plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
             dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
             tooltip:{ y:{ formatter: v => new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v) }},
         }).render();

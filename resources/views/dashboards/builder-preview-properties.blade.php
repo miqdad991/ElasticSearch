@@ -120,7 +120,7 @@
                 @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
-                    <div class="kpi-label">{{ $opt['label'] }}</div>
+                    <div class="kpi-label">{{ __('builder.kpi_prop_' . $kpiKey) }}</div>
                     <div class="kpi-value">{{ $fmtVal }}</div>
                 </div>
             @endif
@@ -239,7 +239,7 @@ function makePieDonut(el, labels, values, type, height) {
         colors: PALETTE.slice(0, labels.length),
         stroke:{ width: type === 'donut' ? 0 : 2 },
         legend:{ position:'bottom', fontSize:'12px' },
-        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'Total' }}}}} : {},
+        plotOptions: type === 'donut' ? { pie:{ donut:{ size:'65%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' }}}}} : {},
         dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] }},
     }).render();
 }
@@ -250,7 +250,7 @@ function makeBar(el, labels, values, height, horizontal, seriesName) {
     new ApexCharts(el, {
         ...baseOpts,
         chart:{ ...baseOpts.chart, type:'bar', height: height },
-        series:[{ name: seriesName || 'Count', data: values }],
+        series:[{ name: seriesName || '{{ __('builder.js_count') }}', data: values }],
         xaxis:{ categories: labels, labels:{ style:{ fontSize:'11px' }}},
         plotOptions:{ bar:{ horizontal: horizontal, borderRadius:5, barHeight: horizontal ? '65%' : undefined, distributed:true }},
         colors: PALETTE,
@@ -268,12 +268,12 @@ function makeBar(el, labels, values, height, horizontal, seriesName) {
     const values = @json($chartData['monthly']->pluck('count'));
     const type   = '{{ $monthlyType }}';
     if (type === 'bar') {
-        makeBar(el, labels, values, 300, false, 'Properties');
+        makeBar(el, labels, values, 300, false, '{{ __('builder.type_properties') }}');
     } else {
         new ApexCharts(el, {
             ...baseOpts,
             chart:{ ...baseOpts.chart, type: type, height: 300 },
-            series:[{ name:'Properties', data: values }],
+            series:[{ name:'{{ __('builder.type_properties') }}', data: values }],
             xaxis:{ categories: labels },
             stroke:{ curve:'smooth', width:2 },
             fill: type === 'area' ? { type:'gradient', gradient:{ shadeIntensity:.6, opacityFrom:.4, opacityTo:.05 }} : {},
@@ -350,7 +350,7 @@ function makeBar(el, labels, values, height, horizontal, seriesName) {
     const data   = @json($chartData['top_props']);
     const labels = data.map(r => r.label);
     const values = data.map(r => r.count);
-    makeBar(el, labels, values, Math.max(280, labels.length * 36), true, 'Contracts');
+    makeBar(el, labels, values, Math.max(280, labels.length * 36), true, '{{ __('builder.type_contracts') }}');
 })();
 @endif
 @endif

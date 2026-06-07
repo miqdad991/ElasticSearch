@@ -43,4 +43,6 @@ return [
     // JS
     'currency_sar' => 'SAR',
     'na'           => 'N/A',
+
+    'moc_logo_alt' => 'Ministry of Culture',
 ];

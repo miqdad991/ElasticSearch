@@ -149,7 +149,7 @@
         {{-- LEFT --}}
         <div class="fmd-left">
             <div class="fmd-card fmd-logo-card">
-                <img src="{{ asset('img/mclogo.png') }}" alt="Ministry of Culture">
+                <img src="{{ asset('img/mclogo.png') }}" alt="{{ __('mc_fm.moc_logo_alt') }}">
             </div>
 
             <div class="fmd-card" style="padding:0;">

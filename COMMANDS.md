@@ -113,11 +113,11 @@ Only needed if you seeded fake data or if the OpenSearch index gets out of sync.
 `sync:run` and `sync:cycle` handle reindexing automatically — skip this if you used them.
 
 ```bash
-docker exec opensearch2-app php artisan os:reindex work_orders
-docker exec opensearch2-app php artisan os:reindex properties
-    docker exec opensearch2-app php artisan os:reindex assets
-docker exec opensearch2-app php artisan os:reindex users
-docker exec opensearch2-app php artisan os:reindex commercial_contracts
+sudo docker exec opensearch2-app php artisan os:reindex work_orders
+sudo docker exec opensearch2-app php artisan os:reindex properties
+sudo docker exec opensearch2-app php artisan os:reindex assets
+sudo docker exec opensearch2-app php artisan os:reindex users
+sudo docker exec opensearch2-app php artisan os:reindex commercial_contracts
 sudo docker exec opensearch2-app php artisan os:reindex installments
 sudo docker exec opensearch2-app php artisan os:reindex contracts
 sudo docker exec opensearch2-app php artisan os:reindex projects

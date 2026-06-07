@@ -198,6 +198,8 @@
         'nav_prev'            => __('mc_wo.nav_prev'),
         'nav_next'            => __('mc_wo.nav_next'),
         'p_building_fallback' => __('mc_wo.p_building_fallback'),
+        'na'                  => __('mc_wo.na'),
+        'close'               => __('mc_wo.close'),
     ];
 @endphp
 <script>
@@ -335,7 +337,7 @@ class CustomDivMarker extends google.maps.OverlayView {
         div.className = 'd-flex gap-10 align-items-center bg-white p-2 radius-xl map-pin-div';
         div.innerHTML = `
             <div class="pin-icon"><img src="${MAP_BUILDING_ICON}" alt=""></div>
-            <div class="pin-count">${this.point.title ?? 'N/A'}</div>
+            <div class="pin-count">${this.point.title ?? MC_WO_TR.na}</div>
         `;
         div.style.position = 'absolute';
         div.style.pointerEvents = 'auto';
@@ -441,7 +443,7 @@ function openFullscreenPopup(contentHtml) {
     overlay.className = 'map-fs-overlay';
     overlay.innerHTML = `
         <div class="map-fs-inner">
-            <button class="map-fs-close" aria-label="Close">&times;</button>
+            <button class="map-fs-close" aria-label="${MC_WO_TR.close}">&times;</button>
             <div class="map-fs-body">${contentHtml}</div>
         </div>
     `;

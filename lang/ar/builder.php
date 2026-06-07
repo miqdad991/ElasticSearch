@@ -96,6 +96,26 @@ return [
     'apply'                   => 'تطبيق',
     'reset'                   => 'إعادة تعيين',
 
+    // ── Chart series labels (JS) ─────────────────────────────────────────────
+    'js_count'                => 'العدد',
+    'js_total'                => 'الإجمالي',
+    'js_value'                => 'القيمة',
+
+    // ── Chart type pills ─────────────────────────────────────────────────────
+    'ctype_line'              => 'خطي',
+    'ctype_bar'               => 'أعمدة',
+    'ctype_area'              => 'مساحي',
+    'ctype_donut'             => 'حلقي',
+    'ctype_pie'               => 'دائري',
+    'ctype_table'             => 'جدول',
+    'ctype_stacked_bar'       => 'أعمدة متراكمة',
+
+    // ── Ejar sync status options ─────────────────────────────────────────────
+    'ejar_synced_successfully'=> 'تمت المزامنة بنجاح',
+    'ejar_pending_sync'       => 'بانتظار المزامنة',
+    'ejar_failed_sync'        => 'فشلت المزامنة',
+    'ejar_not_synced'         => 'غير متزامن',
+
     // ── Filters ───────────────────────────────────────────────────────────────
     'filter_from'             => 'من',
     'filter_to'               => 'إلى',
