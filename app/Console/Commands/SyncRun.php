@@ -40,7 +40,8 @@ class SyncRun extends Command
     protected $signature = 'sync:run
         {resource=service-providers : Resource slug on the Osool API (kebab-case)}
         {--raw-table= : Override raw.<table> name (default: underscored resource)}
-        {--no-etl : Skip the raw → marts transform step}';
+        {--no-etl : Skip the raw → marts transform step}
+        {--no-reindex : Skip the OpenSearch reindex step (sync:cycle uses this and reindexes once at the end)}';
 
     /** Resource slug → ETL class. */
     private const ETL_MAP = [
@@ -66,19 +67,37 @@ class SyncRun extends Command
         'packages'             => PackageEtl::class,
     ];
 
-    /** Resource slug → OpenSearch index class to refresh after ETL. */
-    private const OS_REINDEX_MAP = [
-        'properties'         => PropertyIndex::class,
-        'property-buildings' => PropertyIndex::class,
-        'work-orders'        => WorkOrderIndex::class,
-        'assets'             => AssetIndex::class,
-        'users'                => UserIndex::class,
-        'projects-details'     => ProjectIndex::class,
-        'user-projects'        => ProjectIndex::class,
-        'commercial-contracts' => CommercialContractIndex::class,
-        'payment-details'      => InstallmentIndex::class,
-        'contracts'            => ContractIndex::class,
-        'contract-months'      => ContractIndex::class,
+    /**
+     * Resource slug → every OpenSearch index that must be rebuilt after this
+     * resource changes. An index appears under a resource when its reindex SQL
+     * denormalizes that resource's data (a baked-in label, a bridge array, or an
+     * aggregate). Changing the resource without rebuilding these indices leaves
+     * stale labels/counts in OpenSearch — see each index class's reindex() joins.
+     */
+    public const OS_REINDEX_MAP = [
+        // Fact resources — own index, plus any index that aggregates them.
+        'work-orders'          => [WorkOrderIndex::class, ContractIndex::class],      // ContractIndex aggregates fact_work_order (closed_wo_count, wo_total_cost)
+        'assets'               => [AssetIndex::class],
+        'commercial-contracts' => [CommercialContractIndex::class, InstallmentIndex::class, ProjectIndex::class], // InstallmentIndex joins fact_commercial_contract; ProjectIndex rolls up its lease money
+        'payment-details'      => [InstallmentIndex::class],
+        'contracts'            => [ContractIndex::class, ProjectIndex::class],        // ProjectIndex rolls up dim_contract value
+        'contract-months'      => [ContractIndex::class],                             // ContractIndex aggregates fact_contract_month
+        'properties'           => [PropertyIndex::class, AssetIndex::class, CommercialContractIndex::class, ProjectIndex::class], // property_name denormalized; ProjectIndex counts dim_property
+
+        // Dimension / lookup resources — refresh every index that bakes in their labels.
+        'users'                => [UserIndex::class, WorkOrderIndex::class, AssetIndex::class, PropertyIndex::class, CommercialContractIndex::class, InstallmentIndex::class, ProjectIndex::class], // full_name (incl. ProjectIndex owner_name)
+        'user-projects'        => [ProjectIndex::class, UserIndex::class, WorkOrderIndex::class, AssetIndex::class, PropertyIndex::class, ContractIndex::class], // bridge_user_project → project_ids
+        'projects-details'     => [ProjectIndex::class],
+        'property-buildings'   => [PropertyIndex::class, WorkOrderIndex::class, AssetIndex::class], // building_name
+        'regions'              => [PropertyIndex::class],                             // region_name
+        'cities'               => [PropertyIndex::class, UserIndex::class],           // city_name
+        'service-providers'    => [WorkOrderIndex::class, ContractIndex::class],      // service_provider_name
+        'asset-categories'     => [WorkOrderIndex::class, AssetIndex::class],         // asset_category
+        'asset-names'          => [WorkOrderIndex::class, AssetIndex::class],         // asset_name
+        'priorities'           => [WorkOrderIndex::class],                            // priority_level
+        'asset-statuses'       => [AssetIndex::class],                                // asset_status_name
+        'contract-types'       => [ContractIndex::class],                             // contract_type_name
+        // packages / lease-contract-details feed marts only — no OpenSearch index.
     ];
 
     /**
@@ -159,16 +178,17 @@ class SyncRun extends Command
             $this->warn("  · no ETL registered for '{$resource}' — raw only.");
         }
 
-        if (isset(self::OS_REINDEX_MAP[$resource])) {
-            $idxClass = self::OS_REINDEX_MAP[$resource];
-            $this->line("  · reindexing OpenSearch: {$idxClass}");
-            try {
-                $t0   = microtime(true);
-                $info = app($idxClass)->reindex();
-                $this->info(sprintf('✓ os: %d docs into %s in %ss', $info['docs'], $info['index'], round(microtime(true) - $t0, 2)));
-            } catch (\Throwable $e) {
-                $this->error('Reindex failed: ' . $e->getMessage());
-                return self::FAILURE;
+        if (!$this->option('no-reindex') && isset(self::OS_REINDEX_MAP[$resource])) {
+            foreach (array_unique(self::OS_REINDEX_MAP[$resource]) as $idxClass) {
+                $this->line("  · reindexing OpenSearch: {$idxClass}");
+                try {
+                    $t0   = microtime(true);
+                    $info = app($idxClass)->reindex();
+                    $this->info(sprintf('✓ os: %d docs into %s in %ss', $info['docs'], $info['index'], round(microtime(true) - $t0, 2)));
+                } catch (\Throwable $e) {
+                    $this->error('Reindex failed: ' . $e->getMessage());
+                    return self::FAILURE;
+                }
             }
         }
 

@@ -71,7 +71,10 @@
       "Bash(tasklist *)",
       "Bash(git rm *)",
       "Bash(rm -f -- nul)",
-      "Bash(cmd.exe /c \"if exist nul echo STILL_EXISTS\")"
+      "Bash(cmd.exe /c \"if exist nul echo STILL_EXISTS\")",
+      "PowerShell($f1='C:\\\\xampp\\\\htdocs\\\\laravel\\\\opensearch2\\\\app\\\\Console\\\\Commands\\\\SyncRun.php'; $f2='C:\\\\xampp\\\\htdocs\\\\laravel\\\\opensearch2\\\\app\\\\Console\\\\Commands\\\\SyncCycle.php'; $php=\\(Get-Command php -ErrorAction SilentlyContinue\\); if\\($php\\){ & php -l $f1; & php -l $f2 } else { 'php not on PATH' })",
+      "PowerShell($tools = 'pandoc','wkhtmltopdf','npx','node','soffice','libreoffice'; foreach\\($t in $tools\\){ $c = Get-Command $t -ErrorAction SilentlyContinue; if\\($c\\){ \"{0} -> {1}\" -f $t, $c.Source } else { \"$t -> NOT FOUND\" } })",
+      "PowerShell(New-Item *)"
     ]
   }
 }

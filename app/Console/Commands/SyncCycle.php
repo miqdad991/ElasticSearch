@@ -19,6 +19,10 @@ class SyncCycle extends Command
     /**
      * Stages must run sequentially. Within a stage, resources are independent.
      * Mirrors the ingest order from docs/api/source-tables-per-dashboard.md.
+     *
+     * Note: 'lease-contract-details' is a raw-only feeder (no ETL of its own) —
+     * it must land before 'commercial-contracts', whose ETL enriches from
+     * raw.lease_contract_details. 'packages' has an ETL but no OpenSearch index.
      */
     private const STAGES = [
         1 => ['regions'],
@@ -27,7 +31,7 @@ class SyncCycle extends Command
         4 => ['properties'],
         5 => ['property-buildings', 'asset-categories', 'asset-names', 'priorities'],
         6 => ['work-orders', 'assets', 'lease-contract-details', 'commercial-contracts', 'contracts'],
-        7 => ['payment-details', 'contract-months'],
+        7 => ['payment-details', 'contract-months', 'packages'],
     ];
 
     public function handle(): int
@@ -41,6 +45,7 @@ class SyncCycle extends Command
         $this->info("sync:cycle {$cycleId}");
 
         $ok = 0; $failed = 0;
+        $dirtyIndices = [];   // OpenSearch index classes to rebuild once, after all marts are loaded
         $start = microtime(true);
 
         foreach (self::STAGES as $stage => $resources) {
@@ -51,11 +56,17 @@ class SyncCycle extends Command
                 $this->line("\n—— stage {$stage} · {$slug} ——");
                 $t0 = microtime(true);
 
-                $exit = Artisan::call('sync:run', ['resource' => $slug], $this->output);
+                // Defer reindexing: a single cycle touches many resources that share
+                // indices (e.g. work_orders is denormalized into 8 of them), so we
+                // rebuild each affected index ONCE at the end from the final marts.
+                $exit = Artisan::call('sync:run', ['resource' => $slug, '--no-reindex' => true], $this->output);
                 $dur  = round(microtime(true) - $t0, 2);
 
                 if ($exit === self::SUCCESS) {
                     $ok++;
+                    foreach (SyncRun::OS_REINDEX_MAP[$slug] ?? [] as $idxClass) {
+                        $dirtyIndices[$idxClass] = true;
+                    }
                     Log::info('sync:cycle resource ok', ['cycle_id' => $cycleId, 'stage' => $stage, 'resource' => $slug, 'duration_s' => $dur]);
                 } else {
                     $failed++;
@@ -64,6 +75,25 @@ class SyncCycle extends Command
                         $this->error("Stopping cycle on first failure ({$slug}).");
                         return self::FAILURE;
                     }
+                }
+            }
+        }
+
+        // Single reindex pass — every index touched this cycle, rebuilt once from complete marts.
+        foreach (array_keys($dirtyIndices) as $idxClass) {
+            $this->line("\n—— reindex · {$idxClass} ——");
+            $t0 = microtime(true);
+            try {
+                $info = app($idxClass)->reindex();
+                $dur  = round(microtime(true) - $t0, 2);
+                $this->info(sprintf('✓ os: %d docs into %s in %ss', $info['docs'], $info['index'], $dur));
+                Log::info('sync:cycle reindex ok', ['cycle_id' => $cycleId, 'index' => $idxClass, 'docs' => $info['docs'], 'duration_s' => $dur]);
+            } catch (\Throwable $e) {
+                $failed++;
+                $this->error("Reindex failed ({$idxClass}): " . $e->getMessage());
+                Log::warning('sync:cycle reindex failed', ['cycle_id' => $cycleId, 'index' => $idxClass, 'error' => $e->getMessage()]);
+                if ($stop) {
+                    return self::FAILURE;
                 }
             }
         }
