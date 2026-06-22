@@ -43,7 +43,16 @@ return [
     'ch_status'    => '📊 By status',
     'ch_priority'  => '🔥 By priority',
     'ch_category'  => '🏷 Top asset categories',
-    'ch_building'  => '🏢 Top buildings',
+    'ch_building'  => '🏢 Top buildings by WO type',
+    'ch_sp'        => '🛠 Work orders & cost by service provider',
+    'sp_count'     => 'Work orders',
+    'sp_cost'      => 'Total cost',
+    'ch_cost_type'    => '💰 Cost by work order type',
+    'ch_cost_service' => '💰 Cost by service',
+    'ch_cost_city'    => '💰 Cost by city',
+    'ch_open_closed'  => '📈 Open vs closed work orders per period',
+    'oc_open'         => 'Open',
+    'oc_closed'       => 'Closed',
 
     // Table
     'tbl_title'    => 'Latest 50 work orders',

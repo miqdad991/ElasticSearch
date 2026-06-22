@@ -84,6 +84,7 @@
 
     <div class="grid-charts mb-3">
         <div class="card-soft span-2"><h6>{{ __('wo.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('wo.ch_open_closed') }}</h6><div id="ch_open_closed"></div></div>
         <div class="card-soft"><h6>{{ __('wo.ch_service') }}</h6><div id="ch_service"></div></div>
         <div class="card-soft"><h6>{{ __('wo.ch_wo_type') }}</h6><div id="ch_wo_type"></div></div>
         <div class="card-soft"><h6>{{ __('wo.ch_journey') }}</h6><div id="ch_journey"></div></div>
@@ -91,6 +92,10 @@
         <div class="card-soft"><h6>{{ __('wo.ch_priority') }}</h6><div id="ch_priority"></div></div>
         <div class="card-soft"><h6>{{ __('wo.ch_category') }}</h6><div id="ch_category"></div></div>
         <div class="card-soft span-2"><h6>{{ __('wo.ch_building') }}</h6><div id="ch_building"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('wo.ch_sp') }}</h6><div id="ch_sp"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_cost_type') }}</h6><div id="ch_cost_type"></div></div>
+        <div class="card-soft"><h6>{{ __('wo.ch_cost_service') }}</h6><div id="ch_cost_service"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('wo.ch_cost_city') }}</h6><div id="ch_cost_city"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
@@ -150,6 +155,19 @@ new ApexCharts(document.querySelector('#ch_monthly'), baseChart({
     fill:{ type:'gradient', gradient:{ opacityFrom:.45, opacityTo:.05 } },
     colors:['#6366f1'], markers:{ size:4, colors:['#fff'], strokeColors:'#6366f1', strokeWidth:2 },
 })).render();
+// Open vs closed work orders per period (created month). Two smooth lines.
+new ApexCharts(document.querySelector('#ch_open_closed'), baseChart({
+    chart:{ type:'line', height:300 },
+    series:[
+        { name:'{{ __('wo.oc_open') }}',   data: charts.monthly_status.map(d=>d.open) },
+        { name:'{{ __('wo.oc_closed') }}', data: charts.monthly_status.map(d=>d.closed) },
+    ],
+    xaxis:{ categories: charts.monthly_status.map(d=>d.label) },
+    stroke:{ curve:'smooth', width:3 },
+    colors:['#f59e0b','#10b981'],
+    markers:{ size:3, strokeWidth:2, hover:{ size:5 } },
+    legend:{ show:true, position:'top' },
+})).render();
 const verticalBar = (id, data, palette) => new ApexCharts(document.querySelector(id), baseChart({
     chart:{ type:'bar', height:260 },
     series:[{ name:'{{ __('builder.js_count') }}', data: data.map(d=>d.count) }],
@@ -180,6 +198,59 @@ verticalBar('#ch_journey',  charts.by_journey);
 donut('#ch_status',    charts.by_status);
 verticalBar('#ch_priority', charts.by_priority, ['#94a3b8','#3b82f6','#f59e0b','#ef4444']);
 horizontalBar('#ch_category', charts.by_category);
-horizontalBar('#ch_building', charts.by_building);
+
+// Top buildings, stacked by work-order type. Colors mirror the cost-by-type donut.
+const WO_TYPE_COLORS = { preventive:'#10b981', reactive:'#ef4444' };
+new ApexCharts(document.querySelector('#ch_building'), baseChart({
+    chart:{ type:'bar', height: Math.max(260, charts.by_building.categories.length*40), stacked:true },
+    series: charts.by_building.series,
+    xaxis:{ categories: charts.by_building.categories },
+    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight:'70%' } },
+    colors: charts.by_building.series.map((s,i)=> WO_TYPE_COLORS[s.name] || PALETTE[i%PALETTE.length]),
+    legend:{ show:true, position:'top' }, fill: GRADIENT,
+})).render();
+
+// Combined: work-order count (bars, left axis) + total cost (line, right axis) per service provider.
+new ApexCharts(document.querySelector('#ch_sp'), baseChart({
+    chart:{ type:'line', height: Math.max(320, charts.by_sp.length*30) },
+    series:[
+        { name:'{{ __('wo.sp_count') }}', type:'column', data: charts.by_sp.map(d=>d.count) },
+        { name:'{{ __('wo.sp_cost') }}',  type:'line',   data: charts.by_sp.map(d=>d.cost) },
+    ],
+    xaxis:{ categories: charts.by_sp.map(d=>d.label), labels:{ rotate:-25, trim:true, hideOverlappingLabels:true } },
+    yaxis:[
+        { seriesName:'{{ __('wo.sp_count') }}', title:{ text:'{{ __('wo.sp_count') }}' }, labels:{ formatter:v=>Math.round(v) } },
+        { seriesName:'{{ __('wo.sp_cost') }}', opposite:true, title:{ text:'{{ __('wo.sp_cost') }}' }, labels:{ formatter:v=>v>=1000?(v/1000).toFixed(1)+'k':Math.round(v) } },
+    ],
+    stroke:{ width:[0,3], curve:'smooth' },
+    plotOptions:{ bar:{ borderRadius:6, columnWidth:'55%' } },
+    markers:{ size:4, colors:['#fff'], strokeColors:'#f59e0b', strokeWidth:2 },
+    colors:['#6366f1','#f59e0b'], fill:{ opacity:[0.9,1] },
+    legend:{ show:true, position:'top' },
+})).render();
+
+// Cost-per-dimension charts. Money formatter compacts thousands (e.g. 12.3k).
+const money = v => v>=1000 ? (v/1000).toFixed(1)+'k' : Math.round(v).toString();
+const costDonut = (id, data, palette) => new ApexCharts(document.querySelector(id), baseChart({
+    chart:{ type:'donut', height:280 },
+    series: data.map(d=>d.cost), labels: data.map(d=>d.label),
+    colors: palette || PALETTE, stroke:{ width:0 },
+    legend:{ position:'bottom', fontSize:'12px' },
+    plotOptions:{ pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'{{ __('wo.sp_cost') }}', formatter: w => money(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) } } } } },
+    dataLabels:{ enabled:false },
+    tooltip:{ y:{ formatter: money } },
+})).render();
+const costBar = (id, data) => new ApexCharts(document.querySelector(id), baseChart({
+    chart:{ type:'bar', height: Math.max(260, data.length*36) },
+    series:[{ name:'{{ __('wo.sp_cost') }}', data: data.map(d=>d.cost) }],
+    xaxis:{ categories: data.map(d=>d.label), labels:{ formatter: money } },
+    plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
+    colors: data.map((_,i)=>PALETTE[i%PALETTE.length]),
+    legend:{ show:false }, fill: GRADIENT,
+    tooltip:{ y:{ formatter: money } },
+})).render();
+costDonut('#ch_cost_type',    charts.cost_by_type,    ['#10b981','#ef4444']);
+costDonut('#ch_cost_service', charts.cost_by_service, ['#f97316','#14b8a6']);
+costBar('#ch_cost_city',      charts.cost_by_city);
 </script>
 @endsection

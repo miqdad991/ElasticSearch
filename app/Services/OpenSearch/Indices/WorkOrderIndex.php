@@ -26,6 +26,7 @@ class WorkOrderIndex
                 'supervisor_name'        => ['type' => 'keyword'],
                 'property_id'            => ['type' => 'long'],
                 'building_name'          => ['type' => 'keyword'],
+                'city_name'              => ['type' => 'keyword'],
                 'unit_id'                => ['type' => 'integer'],
                 'asset_category_id'      => ['type' => 'long'],
                 'asset_category'         => ['type' => 'keyword'],
@@ -84,6 +85,7 @@ class WorkOrderIndex
                 f.service_provider_id, sp.name            AS service_provider_name,
                 f.supervisor_id,      sv.full_name        AS supervisor_name,
                 f.property_id, b.building_name,
+                ct.name_en                                AS city_name,
                 f.unit_id,
                 f.asset_category_id, ac.asset_category,
                 f.asset_name_id,     an.asset_name,
@@ -103,6 +105,8 @@ class WorkOrderIndex
             LEFT JOIN marts.dim_service_provider sp ON sp.sp_id             = f.service_provider_id
             LEFT JOIN marts.dim_user             sv ON sv.user_id           = f.supervisor_id
             LEFT JOIN marts.dim_property_building b ON b.building_id        = f.property_id
+            LEFT JOIN marts.dim_property         pp ON pp.property_id       = b.property_id
+            LEFT JOIN marts.dim_city             ct ON ct.city_id           = pp.city_id
             LEFT JOIN marts.dim_asset_category   ac ON ac.asset_category_id = f.asset_category_id
             LEFT JOIN marts.dim_asset_name       an ON an.asset_name_id     = f.asset_name_id
             LEFT JOIN marts.dim_priority         pr ON pr.priority_id       = f.priority_id

@@ -60,8 +60,31 @@ class WorkOrdersDashboardController extends Controller
                     'by_status'          => ['terms' => ['field' => 'status_label', 'size' => 10]],
                     'by_priority'        => ['terms' => ['field' => 'priority_level', 'size' => 10]],
                     'by_category'        => ['terms' => ['field' => 'asset_category', 'size' => 10]],
-                    'by_building'        => ['terms' => ['field' => 'building_name', 'size' => 10]],
+                    'by_building'        => [
+                        'terms' => ['field' => 'building_name', 'size' => 10],
+                        'aggs'  => ['by_type' => ['terms' => ['field' => 'work_order_type', 'size' => 10]]],
+                    ],
+                    'by_sp'              => [
+                        'terms' => ['field' => 'service_provider_name', 'size' => 12],
+                        'aggs'  => ['cost_sum' => ['sum' => ['field' => 'cost']]],
+                    ],
+                    'cost_by_type'       => [
+                        'terms' => ['field' => 'work_order_type', 'size' => 10, 'order' => ['cost_sum' => 'desc']],
+                        'aggs'  => ['cost_sum' => ['sum' => ['field' => 'cost']]],
+                    ],
+                    'cost_by_service'    => [
+                        'terms' => ['field' => 'service_type', 'size' => 10, 'order' => ['cost_sum' => 'desc']],
+                        'aggs'  => ['cost_sum' => ['sum' => ['field' => 'cost']]],
+                    ],
+                    'cost_by_city'       => [
+                        'terms' => ['field' => 'city_name', 'size' => 15, 'order' => ['cost_sum' => 'desc']],
+                        'aggs'  => ['cost_sum' => ['sum' => ['field' => 'cost']]],
+                    ],
                     'monthly'            => ['terms' => ['field' => 'created_year_month', 'size' => 60, 'order' => ['_key' => 'asc']]],
+                    'monthly_status'     => [
+                        'terms' => ['field' => 'created_year_month', 'size' => 60, 'order' => ['_key' => 'asc']],
+                        'aggs'  => ['closed' => ['filter' => ['term' => ['workorder_journey' => 'finished']]]],
+                    ],
                     'distinct_sps'       => ['cardinality' => ['field' => 'service_provider_id']],
                     'distinct_mr'        => ['cardinality' => ['field' => 'maintenance_request_id']],
                     'finished'           => ['filter' => ['term' => ['workorder_journey' => 'finished']]],
@@ -94,6 +117,28 @@ class WorkOrdersDashboardController extends Controller
             ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => $b['doc_count']])
             ->values();
 
+        // Like $bucket, but carries the summed cost (for cost-per-dimension charts).
+        $costBucket = fn (string $key) => collect($aggs[$key]['buckets'] ?? [])
+            ->map(fn ($b) => ['label' => (string) $b['key'], 'cost' => round($b['cost_sum']['value'] ?? 0, 2)])
+            ->values();
+
+        // Top buildings broken down by work-order type → stacked-bar shape:
+        // { categories: [building…], series: [{ name: type, data: [count per building] }] }.
+        $buildingBuckets = $aggs['by_building']['buckets'] ?? [];
+        $woTypes = collect($buildingBuckets)
+            ->flatMap(fn ($b) => collect($b['by_type']['buckets'] ?? [])->pluck('key'))
+            ->unique()->values();
+        $buildingsByType = [
+            'categories' => collect($buildingBuckets)->map(fn ($b) => (string) $b['key'])->values(),
+            'series'     => $woTypes->map(fn ($type) => [
+                'name' => (string) $type,
+                'data' => collect($buildingBuckets)->map(function ($b) use ($type) {
+                    $hit = collect($b['by_type']['buckets'] ?? [])->firstWhere('key', $type);
+                    return $hit['doc_count'] ?? 0;
+                })->values(),
+            ])->values(),
+        ];
+
         return view('dashboards.work-orders', [
             'filters' => $filters,
             'dates'   => ['from' => $from, 'to' => $to],
@@ -101,13 +146,30 @@ class WorkOrdersDashboardController extends Controller
             'rows'    => collect($hits)->pluck('_source'),
             'charts'  => [
                 'monthly'        => $bucket('monthly'),
+                'monthly_status' => collect($aggs['monthly_status']['buckets'] ?? [])
+                    ->map(fn ($b) => [
+                        'label'  => (string) $b['key'],
+                        'closed' => $b['closed']['doc_count'] ?? 0,
+                        'open'   => ($b['doc_count'] ?? 0) - ($b['closed']['doc_count'] ?? 0),
+                    ])
+                    ->values(),
                 'by_service'     => $bucket('by_service_type'),
                 'by_wo_type'     => $bucket('by_wo_type'),
                 'by_journey'     => $bucket('by_journey'),
                 'by_status'      => $bucket('by_status'),
                 'by_priority'    => $bucket('by_priority'),
                 'by_category'    => $bucket('by_category'),
-                'by_building'    => $bucket('by_building'),
+                'by_building'    => $buildingsByType,
+                'by_sp'          => collect($aggs['by_sp']['buckets'] ?? [])
+                    ->map(fn ($b) => [
+                        'label' => (string) $b['key'],
+                        'count' => $b['doc_count'],
+                        'cost'  => round($b['cost_sum']['value'] ?? 0, 2),
+                    ])
+                    ->values(),
+                'cost_by_type'    => $costBucket('cost_by_type'),
+                'cost_by_service' => $costBucket('cost_by_service'),
+                'cost_by_city'    => $costBucket('cost_by_city'),
             ],
         ]);
     }
