@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use OpenSearch\Client;
 
 class ContractsDashboardController extends Controller
@@ -15,7 +16,7 @@ class ContractsDashboardController extends Controller
 
         $filters = array_filter([
             'service_provider_id' => $request->query('service_provider_id'),
-            'contract_type_id'    => $request->query('contract_type_id'),
+            'contract_class'      => $request->query('contract_class'),
             'status'              => $request->query('status'),
         ], fn ($v) => $v !== null && $v !== '');
 
@@ -47,7 +48,7 @@ class ContractsDashboardController extends Controller
                     'expired'        => ['filter' => ['term' => ['is_expired' => true]]],
                     'subcontracts'   => ['filter' => ['term' => ['is_subcontract' => true]]],
                     'by_type'        => [
-                        'terms' => ['field' => 'contract_type_name', 'size' => 10],
+                        'terms' => ['field' => 'contract_class', 'size' => 10],
                         'aggs'  => ['v' => ['sum' => ['field' => 'contract_value']]],
                     ],
                     'top_sp'         => [
@@ -80,20 +81,35 @@ class ContractsDashboardController extends Controller
             'WO Extras Total' => round($aggs['sum_wo_cost']['value']   ?? 0, 2),
         ];
 
+        $classLabels = [
+            'regular'  => __('contracts.type_regular'),
+            'advanced' => __('contracts.type_advanced'),
+        ];
         $charts = [
             'by_type'     => collect($aggs['by_type']['buckets'] ?? [])
-                ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
+                ->map(fn ($b) => ['label' => $classLabels[$b['key']] ?? (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
             'top_sp'      => collect($aggs['top_sp']['buckets'] ?? [])
                 ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
             'top_overdue' => collect($aggs['top_overdue']['buckets'] ?? [])
                 ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
         ];
 
+        // Filter option lists (real labels, not raw IDs). Restrict SPs to those that
+        // actually own contracts so the dropdown isn't cluttered with unused providers.
+        $spOptions = DB::table('marts.dim_contract as dc')
+            ->join('marts.dim_service_provider as sp', 'sp.sp_id', '=', 'dc.service_provider_id')
+            ->where('dc.is_current', true)->where('dc.is_deleted', false)
+            ->whereNotNull('dc.service_provider_id')
+            ->distinct()->orderBy('sp.name')
+            ->pluck('sp.name', 'sp.sp_id');
+
         return view('dashboards.contracts', [
-            'filters' => $filters,
-            'cards'   => $cards,
-            'charts'  => $charts,
-            'rows'    => collect($hits)->pluck('_source'),
+            'filters'     => $filters,
+            'cards'       => $cards,
+            'charts'      => $charts,
+            'spOptions'   => $spOptions,
+            'classLabels' => $classLabels,
+            'rows'        => collect($hits)->pluck('_source'),
         ]);
     }
 }

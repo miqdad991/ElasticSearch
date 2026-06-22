@@ -10,8 +10,10 @@ return [
     'any'   => '— any —',
 
     'f_service_provider_id' => 'Service provider',
-    'f_contract_type_id'    => 'Contract type',
+    'f_contract_class'      => 'Contract type',
     'f_status'              => 'Status',
+    'type_regular'          => 'Regular',
+    'type_advanced'         => 'Advanced',
 
     'kpi' => [
         'Total Contracts'   => 'Total contracts',
@@ -29,8 +31,10 @@ return [
     ],
 
     'ch_type'    => '📄 Value by contract type',
-    'ch_sp'      => '🏢 Top service providers by value',
+    'ch_sp'      => '🏢 Top service providers by total contract value',
     'ch_overdue' => '🚨 Top contracts by overdue amount',
+    'ax_value'   => 'Contract value',
+    'ax_overdue' => 'Overdue amount',
 
     'tbl_title'      => 'Top 30 contracts by value',
     'col_contract'   => 'Contract',

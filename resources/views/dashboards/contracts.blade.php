@@ -36,17 +36,17 @@
     <form method="get" class="card-soft mb-3">
         <div class="filter-grid">
             @php $opts = [
-                'service_provider_id' => [1,2,3,4,5,6],
-                'contract_type_id'    => [1,2,3,4,5,6,7,8],
-                'status'              => [0,1],
+                'service_provider_id' => $spOptions,
+                'contract_class'      => $classLabels,
+                'status'              => [1 => __('contracts.st_active'), 0 => __('contracts.st_inactive')],
             ]; @endphp
             @foreach ($opts as $key => $values)
                 <div>
                     <label>{{ __('contracts.f_' . $key) }}</label>
                     <select name="{{ $key }}">
                         <option value="">{{ __('contracts.any') }}</option>
-                        @foreach ($values as $v)
-                            <option value="{{ $v }}" @selected(($filters[$key] ?? null) == $v)>{{ $v }}</option>
+                        @foreach ($values as $val => $lbl)
+                            <option value="{{ $val }}" @selected((string) ($filters[$key] ?? null) === (string) $val)>{{ $lbl }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -101,7 +101,7 @@
                             <code style="color:#4338ca;">{{ $r['contract_number'] ?? '' }}</code>
                             @if (!empty($r['is_subcontract'])) <span class="pill" style="background:#ede9fe;color:#6d28d9;">{{ __('contracts.pill_sub') }}</span> @endif
                         </td>
-                        <td>{{ $r['contract_type_name'] ?? '—' }}</td>
+                        <td>{{ $classLabels[$r['contract_class'] ?? ''] ?? ($r['contract_type_name'] ?? '—') }}</td>
                         <td>{{ $r['service_provider_name'] ?? '—' }}</td>
                         <td>{{ $r['start_date'] ?? '' }}</td>
                         <td>{{ $r['end_date'] ?? '' }}</td>
@@ -148,16 +148,25 @@ const base = (extra={}) => ({
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });
-const hbar = (id, data, palette) => new ApexCharts(document.querySelector(id), base({
-    chart:{ type:'bar', height: Math.max(260, data.length*36) },
-    series:[{ name:'{{ __('builder.js_value') }}', data: data.map(d=>d.count) }],
-    xaxis:{ categories: data.map(d=>d.label) },
+// Compact money for axis/labels (1.2M, 340K); full grouped number for tooltips.
+const money     = v => Math.abs(v)>=1e6 ? (v/1e6).toFixed(1)+'M' : Math.abs(v)>=1e3 ? (v/1e3).toFixed(1)+'K' : Math.round(v).toString();
+const moneyFull = v => Number(v||0).toLocaleString(undefined, { maximumFractionDigits:2 });
+const hbar = (id, data, axisTitle, palette) => new ApexCharts(document.querySelector(id), base({
+    chart:{ type:'bar', height: Math.max(260, data.length*38) },
+    series:[{ name: axisTitle, data: data.map(d=>d.count) }],
+    xaxis:{
+        categories: data.map(d=>d.label),
+        title:{ text: axisTitle, style:{ fontSize:'12px', color:'#64748b', fontWeight:600 } },
+        labels:{ formatter: money },
+    },
     plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
     colors: data.map((_,i)=>(palette||PALETTE)[i%(palette||PALETTE).length]),
     legend:{ show:false }, fill: GRADIENT,
+    dataLabels:{ enabled:true, formatter: money, offsetX:6, style:{ fontSize:'11px', fontWeight:600, colors:['#0f172a'] }, background:{ enabled:true, foreColor:'#fff', borderWidth:0, opacity:0.85, padding:3 } },
+    tooltip:{ y:{ formatter: moneyFull } },
 })).render();
-hbar('#ch_type',    charts.by_type);
-hbar('#ch_sp',      charts.top_sp);
-hbar('#ch_overdue', charts.top_overdue, ['#ef4444','#f97316','#f59e0b','#dc2626','#b91c1c']);
+hbar('#ch_type',    charts.by_type,    '{{ __('contracts.ax_value') }}');
+hbar('#ch_sp',      charts.top_sp,     '{{ __('contracts.ax_value') }}');
+hbar('#ch_overdue', charts.top_overdue,'{{ __('contracts.ax_overdue') }}', ['#ef4444','#f97316','#f59e0b','#dc2626','#b91c1c']);
 </script>
 @endsection
