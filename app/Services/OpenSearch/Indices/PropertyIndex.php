@@ -39,6 +39,7 @@ class PropertyIndex
                 'contract_count'     => ['type' => 'integer'],
                 'rent_count'         => ['type' => 'integer'],
                 'lease_count'        => ['type' => 'integer'],
+                'maintenance_count'  => ['type' => 'integer'],
                 'active_contracts'   => ['type' => 'integer'],
                 'auto_renewal_count' => ['type' => 'integer'],
                 'total_budget'       => ['type' => 'scaled_float', 'scaling_factor' => 100],
@@ -76,6 +77,14 @@ class PropertyIndex
                 COALESCE(rl.active_contracts, 0)   AS active_contracts,
                 COALESCE(rl.auto_renewal_count, 0) AS auto_renewal_count,
                 COALESCE(rl.total_budget, 0)       AS total_budget,
+                COALESCE((
+                    SELECT COUNT(DISTINCT bcpb.contract_id)
+                    FROM marts.bridge_contract_property_building bcpb
+                    JOIN marts.dim_property_building pb ON pb.building_id = bcpb.building_id
+                    JOIN marts.dim_contract dc        ON dc.contract_id = bcpb.contract_id
+                    WHERE pb.property_id = p.property_id
+                      AND dc.is_current AND NOT dc.is_deleted
+                ), 0)                              AS maintenance_count,
                 p.created_at,
                 to_char(p.created_at, 'YYYY-MM') AS created_year_month,
                 COALESCE(

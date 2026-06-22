@@ -47,7 +47,7 @@
             @php $simple = [
                 'property_type' => ['building' => __('properties.opt_building'), 'complex' => __('properties.opt_complex')],
                 'location_type' => ['single_location' => __('properties.opt_single_location'), 'multiple_location' => __('properties.opt_multiple_location')],
-                'status'        => [1 => __('properties.opt_active'), 0 => __('properties.opt_inactive')],
+                'status'        => [1 => __('properties.opt_completed'), 0 => __('properties.opt_draft')],
             ]; @endphp
             @foreach ($simple as $key => $values)
                 <div>
@@ -117,6 +117,39 @@
         <div class="card-soft span-2"><h6>{{ __('properties.ch_top') }}</h6><div id="ch_top"></div></div>
     </div>
 
+    <div class="card-soft mb-3" style="padding:0;overflow:hidden;">
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('properties.reg_title') }}</div>
+        <div style="overflow-x:auto;">
+            <table class="table table-sm mb-0">
+                <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
+                <tr>
+                    <th>{{ __('properties.reg_region') }}</th>
+                    <th class="text-right">{{ __('properties.reg_properties') }}</th>
+                    <th class="text-right">{{ __('properties.reg_active_contracts') }}</th>
+                    <th class="text-right">{{ __('properties.reg_work_orders') }}</th>
+                    <th class="text-right">{{ __('properties.reg_budget') }}</th>
+                    <th class="text-right">{{ __('properties.reg_expense') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($regionTable as $rg)
+                    <tr>
+                        <td><strong>{{ $rg['region'] ?: '—' }}</strong></td>
+                        <td class="text-right">{{ number_format($rg['properties']) }}</td>
+                        <td class="text-right">{{ number_format($rg['active_contracts']) }}</td>
+                        <td class="text-right">{{ number_format($rg['work_orders']) }}</td>
+                        <td class="text-right">{{ number_format($rg['total_budget'], 2) }}</td>
+                        <td class="text-right">{{ number_format($rg['total_expense'], 2) }}</td>
+                    </tr>
+                @endforeach
+                @if ($regionTable->isEmpty())
+                    <tr><td colspan="6" class="text-center text-muted py-4">{{ __('properties.empty') }}</td></tr>
+                @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="card-soft" style="padding:0;overflow:hidden;">
         <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('properties.tbl_title') }}</div>
         <div style="overflow-x:auto;">
@@ -135,7 +168,7 @@
                         <td class="text-right">{{ $r['buildings_count'] ?? 0 }}</td>
                         <td class="text-right">{{ $r['total_floors'] ?? '—' }}</td>
                         <td class="text-right">{{ $r['total_units'] ?? '—' }}</td>
-                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false) ? __('properties.st_active') : __('properties.st_inactive') }}</span></td>
+                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false) ? __('properties.st_completed') : __('properties.st_draft') }}</span></td>
                         <td>{{ !empty($r['created_at']) ? \Illuminate\Support\Carbon::parse($r['created_at'])->format('Y-m-d') : '—' }}</td>
                     </tr>
                 @endforeach
@@ -195,6 +228,18 @@ donut('#ch_type',   charts.by_type,   ['#0ea5e9','#8b5cf6']);
 donut('#ch_status', charts.by_status, ['#10b981','#94a3b8']);
 verticalBar('#ch_region', charts.by_region);
 verticalBar('#ch_city',   charts.by_city);
-horizontalBar('#ch_top',  charts.top_props);
+
+// Top properties: maintenance vs lease contract counts, stacked per property.
+new ApexCharts(document.querySelector('#ch_top'), baseChart({
+    chart:{ type:'bar', height: Math.max(260, charts.top_props.length*40), stacked:true },
+    series:[
+        { name:'{{ __('properties.ct_maintenance') }}', data: charts.top_props.map(d=>d.maintenance) },
+        { name:'{{ __('properties.ct_lease') }}',       data: charts.top_props.map(d=>d.lease) },
+    ],
+    xaxis:{ categories: charts.top_props.map(d=>d.label) },
+    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight:'70%' } },
+    colors:['#f59e0b','#0ea5e9'],
+    legend:{ show:true, position:'top' }, fill: GRADIENT,
+})).render();
 </script>
 @endsection

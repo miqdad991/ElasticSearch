@@ -80,17 +80,17 @@ class SyncRun extends Command
         'assets'               => [AssetIndex::class],
         'commercial-contracts' => [CommercialContractIndex::class, InstallmentIndex::class, ProjectIndex::class], // InstallmentIndex joins fact_commercial_contract; ProjectIndex rolls up its lease money
         'payment-details'      => [InstallmentIndex::class],
-        'contracts'            => [ContractIndex::class, ProjectIndex::class],        // ProjectIndex rolls up dim_contract value
+        'contracts'            => [ContractIndex::class, ProjectIndex::class, PropertyIndex::class], // ProjectIndex rolls up dim_contract value; PropertyIndex counts maintenance contracts per property
         'contract-months'      => [ContractIndex::class],                             // ContractIndex aggregates fact_contract_month
-        'properties'           => [PropertyIndex::class, AssetIndex::class, CommercialContractIndex::class, ProjectIndex::class], // property_name denormalized; ProjectIndex counts dim_property
+        'properties'           => [PropertyIndex::class, AssetIndex::class, CommercialContractIndex::class, ProjectIndex::class, WorkOrderIndex::class], // property_name denormalized; ProjectIndex counts dim_property; WorkOrderIndex bakes city/region from property
 
         // Dimension / lookup resources — refresh every index that bakes in their labels.
         'users'                => [UserIndex::class, WorkOrderIndex::class, AssetIndex::class, PropertyIndex::class, CommercialContractIndex::class, InstallmentIndex::class, ProjectIndex::class], // full_name (incl. ProjectIndex owner_name)
         'user-projects'        => [ProjectIndex::class, UserIndex::class, WorkOrderIndex::class, AssetIndex::class, PropertyIndex::class, ContractIndex::class], // bridge_user_project → project_ids
         'projects-details'     => [ProjectIndex::class],
         'property-buildings'   => [PropertyIndex::class, WorkOrderIndex::class, AssetIndex::class], // building_name
-        'regions'              => [PropertyIndex::class],                             // region_name
-        'cities'               => [PropertyIndex::class, UserIndex::class],           // city_name
+        'regions'              => [PropertyIndex::class, WorkOrderIndex::class],      // region_name
+        'cities'               => [PropertyIndex::class, UserIndex::class, WorkOrderIndex::class], // city_name
         'service-providers'    => [WorkOrderIndex::class, ContractIndex::class],      // service_provider_name
         'asset-categories'     => [WorkOrderIndex::class, AssetIndex::class],         // asset_category
         'asset-names'          => [WorkOrderIndex::class, AssetIndex::class],         // asset_name

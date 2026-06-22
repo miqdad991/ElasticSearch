@@ -53,12 +53,22 @@ class PropertiesDashboardController extends Controller
                     'complexes'     => ['filter' => ['term' => ['property_type' => 'complex']]],
                     'monthly'       => ['terms' => ['field' => 'created_year_month', 'size' => 60, 'order' => ['_key' => 'asc']]],
                     'by_type'       => ['terms' => ['field' => 'property_type', 'size' => 5]],
-                    'by_region'     => ['terms' => ['field' => 'region_name', 'size' => 15]],
+                    'by_region'     => [
+                        'terms' => ['field' => 'region_name', 'size' => 15],
+                        'aggs'  => [
+                            'active_c' => ['sum' => ['field' => 'active_contracts']],
+                            'budget'   => ['sum' => ['field' => 'total_budget']],
+                        ],
+                    ],
                     'by_city'       => ['terms' => ['field' => 'city_name', 'size' => 15]],
                     'by_status'     => ['terms' => ['field' => 'is_active', 'size' => 5]],
                     'top_property_contracts' => [
                         'terms' => ['field' => 'property_name.raw', 'size' => 15, 'order' => ['c' => 'desc']],
-                        'aggs'  => ['c' => ['sum' => ['field' => 'contract_count']]],
+                        'aggs'  => [
+                            'c'           => ['sum' => ['field' => 'contract_count']],
+                            'maintenance' => ['sum' => ['field' => 'maintenance_count']],
+                            'lease'       => ['sum' => ['field' => 'lease_count']],
+                        ],
                     ],
                 ],
             ],
@@ -73,6 +83,10 @@ class PropertiesDashboardController extends Controller
                 'total_cost'     => ['sum' => ['field' => 'cost']],
                 'distinct_sps'   => ['cardinality' => ['field' => 'service_provider_id']],
                 'distinct_mr'    => ['cardinality' => ['field' => 'maintenance_request_id']],
+                'by_region'      => [
+                    'terms' => ['field' => 'region_name', 'size' => 50],
+                    'aggs'  => ['expense' => ['sum' => ['field' => 'cost']]],
+                ],
             ],
         ]);
         $assetsResp = $this->safeSearch($prefix . 'assets', [
@@ -115,9 +129,11 @@ class PropertiesDashboardController extends Controller
                 ->map(function ($b) use ($key) {
                     $raw = $b['key'];
                     if ($key === 'by_status') {
-                        $label = (int) $raw === 1 || $raw === true ? 'Active' : 'Inactive';
+                        $label = (int) $raw === 1 || $raw === true
+                            ? __('properties.st_completed')
+                            : __('properties.st_draft');
                     } elseif (is_bool($raw)) {
-                        $label = $raw ? 'Active' : 'Inactive';
+                        $label = $raw ? __('properties.st_completed') : __('properties.st_draft');
                     } else {
                         $label = (string) $raw;
                     }
@@ -126,8 +142,37 @@ class PropertiesDashboardController extends Controller
                 ->values();
         };
 
+        // Regional analysis: properties + active contracts + budget come from the
+        // properties index (per-region sub-aggs); work orders + expense come from the
+        // work_orders index keyed by the same region_name.
+        $woByRegion = collect($woResp['aggregations']['by_region']['buckets'] ?? [])
+            ->keyBy('key')
+            ->map(fn ($b) => [
+                'work_orders' => $b['doc_count'],
+                'expense'     => round($b['expense']['value'] ?? 0, 2),
+            ]);
+        $regionTable = collect($aggs['by_region']['buckets'] ?? [])
+            ->map(function ($b) use ($woByRegion) {
+                $name = (string) $b['key'];
+                $wo   = $woByRegion[$name] ?? ['work_orders' => 0, 'expense' => 0];
+                return [
+                    'region'           => $name,
+                    'properties'       => $b['doc_count'],
+                    'active_contracts' => (int) ($b['active_c']['value'] ?? 0),
+                    'work_orders'      => $wo['work_orders'],
+                    'total_budget'     => round($b['budget']['value'] ?? 0, 2),
+                    'total_expense'    => $wo['expense'],
+                ];
+            })
+            ->values();
+
         $topProps = collect($aggs['top_property_contracts']['buckets'] ?? [])
-            ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => (int) ($b['c']['value'] ?? 0)])
+            ->map(fn ($b) => [
+                'label'       => (string) $b['key'],
+                'count'       => (int) ($b['c']['value'] ?? 0),
+                'maintenance' => (int) ($b['maintenance']['value'] ?? 0),
+                'lease'       => (int) ($b['lease']['value'] ?? 0),
+            ])
             ->values();
 
         $regions = DB::table('marts.dim_region')->where('is_deleted', false)
@@ -138,6 +183,7 @@ class PropertiesDashboardController extends Controller
         return view('dashboards.properties', [
             'filters'     => $filters,
             'cards'       => $cards,
+            'regionTable' => $regionTable,
             'regions'     => $regions,
             'cities'      => $cities,
             'rows'        => collect($hits)->pluck('_source'),

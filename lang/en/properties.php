@@ -23,6 +23,8 @@ return [
     'opt_multiple_location'=> 'Multiple locations',
     'opt_active'           => 'Active',
     'opt_inactive'         => 'Inactive',
+    'opt_completed'        => 'Completed',
+    'opt_draft'            => 'Draft',
 
     // Row group titles
     'row_properties' => 'Properties',
@@ -35,7 +37,7 @@ return [
         'Total Buildings'     => 'Total buildings',
         'Single Buildings'    => 'Single buildings',
         'Complexes'           => 'Complexes',
-        'Active Properties'   => 'Active properties',
+        'Active Properties'   => 'Completed properties',
         'Total Contracts'     => 'Total contracts',
         'Active Contracts'    => 'Active contracts',
         'Rent Contracts'      => 'Rent contracts',
@@ -54,7 +56,18 @@ return [
     'ch_status'  => '⚡ Status',
     'ch_region'  => '🗺 By region',
     'ch_city'    => '🏙 By city',
-    'ch_top'     => '🏆 Top properties by contract count',
+    'ch_top'     => '🏆 Top properties — maintenance vs lease contracts',
+    'ct_maintenance' => 'Maintenance',
+    'ct_lease'       => 'Lease',
+
+    // Regional analysis table
+    'reg_title'            => '🗺 Regional analysis',
+    'reg_region'           => 'Region',
+    'reg_properties'       => 'Total properties',
+    'reg_active_contracts' => 'Active contracts',
+    'reg_work_orders'      => 'Total work orders',
+    'reg_budget'           => 'Total budget',
+    'reg_expense'          => 'Total expense',
 
     // Table
     'tbl_title'   => 'Latest 50 properties',
@@ -70,5 +83,7 @@ return [
     'col_created' => 'Created',
     'st_active'   => 'Active',
     'st_inactive' => 'Inactive',
+    'st_completed' => 'Completed',
+    'st_draft'     => 'Draft',
     'empty'       => 'No matching properties.',
 ];
