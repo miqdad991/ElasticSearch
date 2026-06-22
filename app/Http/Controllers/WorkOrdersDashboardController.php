@@ -29,6 +29,20 @@ class WorkOrdersDashboardController extends Controller
         if ($pid = session('selected_project_id')) {
             $must[] = ['term' => ['project_ids' => (int) $pid]];
         }
+
+        // Date range on created_at (YYYY-MM-DD inputs). 'to' is inclusive of the
+        // whole day via lte on the date — OpenSearch rounds a bare date up to the
+        // day's end on the upper bound.
+        $from = $request->query('from');
+        $to   = $request->query('to');
+        $range = array_filter([
+            'gte' => $from ?: null,
+            'lte' => $to ?: null,
+        ]);
+        if ($range) {
+            $range['format'] = 'yyyy-MM-dd';
+            $must[] = ['range' => ['created_at' => $range]];
+        }
         $query = $must ? ['bool' => ['must' => $must]] : ['match_all' => (object) []];
 
         $resp = $this->os->search([
@@ -82,6 +96,7 @@ class WorkOrdersDashboardController extends Controller
 
         return view('dashboards.work-orders', [
             'filters' => $filters,
+            'dates'   => ['from' => $from, 'to' => $to],
             'cards'   => $cards,
             'rows'    => collect($hits)->pluck('_source'),
             'charts'  => [

@@ -18,6 +18,8 @@ return [
     'f_status_code'       => 'Status',
     'f_priority_id'       => 'Priority',
     'f_asset_category_id' => 'Asset category',
+    'f_from'              => 'From date',
+    'f_to'                => 'To date',
 
     // KPI labels (mirror controller keys)
     'kpi' => [

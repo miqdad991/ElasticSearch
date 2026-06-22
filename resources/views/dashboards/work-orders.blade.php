@@ -24,7 +24,7 @@
     .filter-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
     @media (min-width:768px) { .filter-grid { grid-template-columns:repeat(6,minmax(0,1fr)); } }
     .filter-grid label { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#64748b; font-weight:600; }
-    .filter-grid select { width:100%; padding:.4rem .5rem; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; }
+    .filter-grid select, .filter-grid input[type=date] { width:100%; padding:.4rem .5rem; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; background:#fff; }
     .gradient-title { background:linear-gradient(90deg,#6366f1,#d946ef,#f43f5e); -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:700; }
 @endsection
 
@@ -59,6 +59,14 @@
                     </select>
                 </div>
             @endforeach
+            <div>
+                <label>{{ __('wo.f_from') }}</label>
+                <input type="date" name="from" value="{{ $dates['from'] ?? '' }}" max="{{ $dates['to'] ?? '' }}">
+            </div>
+            <div>
+                <label>{{ __('wo.f_to') }}</label>
+                <input type="date" name="to" value="{{ $dates['to'] ?? '' }}" min="{{ $dates['from'] ?? '' }}">
+            </div>
         </div>
         <button class="btn btn-primary btn-sm mt-3">{{ __('wo.apply') }}</button>
     </form>

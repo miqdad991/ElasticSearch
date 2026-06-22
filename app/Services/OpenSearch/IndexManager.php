@@ -19,6 +19,19 @@ class IndexManager
     }
 
     /**
+     * True if the alias for $entity exists and resolves to at least one index.
+     * Used by `os:ensure` to detect a missing index and self-heal.
+     */
+    public function aliasExists(string $entity): bool
+    {
+        try {
+            return !empty($this->client->indices()->getAlias(['name' => $this->aliasName($entity)]));
+        } catch (\Throwable) {
+            return false; // alias (and its index) don't exist
+        }
+    }
+
+    /**
      * Create a new versioned index with the given mapping/settings and return its name.
      * Caller swaps the alias to it after a successful bulk load.
      */
@@ -73,6 +86,51 @@ class IndexManager
                 }
             }
         }
+
+        // Sweep up leftover versioned indices for this entity. A reindex that
+        // dies after createVersionedIndex() but before this swap orphans an
+        // empty index that the alias never pointed at — so the loop above never
+        // deletes it. Left unchecked these accumulate one shard each and can hit
+        // cluster.max_shards_per_node, after which new index creation fails.
+        $this->pruneOrphans($entity, $newIndex);
+    }
+
+    /**
+     * Delete versioned indices for $entity that are strictly older than
+     * $keepIndex (by their YmdHis timestamp suffix) and not the live one.
+     *
+     * The age check is deliberate: a concurrent reindex builds a NEWER index
+     * (larger timestamp) that may still be mid-bulk, so we must never delete it.
+     * Orphans from failed runs are always older than the latest good build.
+     *
+     * @return string[] names of deleted orphan indices
+     */
+    public function pruneOrphans(string $entity, string $keepIndex): array
+    {
+        $prefix  = $this->aliasName($entity) . '_';
+        $keepTs  = substr($keepIndex, strlen($prefix));
+        $deleted = [];
+
+        try {
+            $all = array_keys($this->client->indices()->get(['index' => $prefix . '*']));
+        } catch (\Throwable) {
+            return $deleted; // nothing matched, or transient API error
+        }
+
+        foreach ($all as $name) {
+            $ts = substr($name, strlen($prefix));
+            if ($name === $keepIndex || $ts === '' || $ts >= $keepTs) {
+                continue; // keep the live index and any newer (possibly in-flight) build
+            }
+            try {
+                $this->client->indices()->delete(['index' => $name]);
+                $deleted[] = $name;
+            } catch (\Throwable) {
+                // ignore
+            }
+        }
+
+        return $deleted;
     }
 
     public function bulk(array $body): void

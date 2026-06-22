@@ -18,6 +18,8 @@ return [
     'f_status_code'       => 'الحالة',
     'f_priority_id'       => 'الأولوية',
     'f_asset_category_id' => 'فئة الأصل',
+    'f_from'              => 'من تاريخ',
+    'f_to'                => 'إلى تاريخ',
 
     // KPI labels
     'kpi' => [

@@ -219,14 +219,25 @@ Only needed if the OpenSearch index gets out of sync.
 `sync:run` and `sync:cycle` handle reindexing automatically — skip this if you used them.
 
 ```bash
-docker exec opensearch2-app php artisan os:reindex work_orders
-docker exec opensearch2-app php artisan os:reindex properties
-docker exec opensearch2-app php artisan os:reindex assets
-docker exec opensearch2-app php artisan os:reindex users
-docker exec opensearch2-app php artisan os:reindex commercial_contracts
-docker exec opensearch2-app php artisan os:reindex installments
-docker exec opensearch2-app php artisan os:reindex contracts
-docker exec opensearch2-app php artisan os:reindex projects
+sudo docker exec opensearch2-app php artisan os:reindex work_orders
+sudo docker exec opensearch2-app php artisan os:reindex properties
+sudo docker exec opensearch2-app php artisan os:reindex assets
+sudo docker exec opensearch2-app php artisan os:reindex users
+sudo docker exec opensearch2-app php artisan os:reindex commercial_contracts
+sudo docker exec opensearch2-app php artisan os:reindex installments
+sudo docker exec opensearch2-app php artisan os:reindex contracts
+sudo docker exec opensearch2-app php artisan os:reindex projects
+```
+
+### Self-heal a missing index
+
+`os:reindex` rebuilds unconditionally. `os:ensure` rebuilds **only** the indices whose alias is
+currently missing — this is what the scheduler runs every 5 minutes (§7), and it's the fix for
+the recurring `no such index [osool_*]` error. You can also run it on demand:
+
+```bash
+docker exec opensearch2-app php artisan os:ensure              # check & heal all entities
+docker exec opensearch2-app php artisan os:ensure properties   # check & heal one entity
 ```
 
 ---
@@ -256,16 +267,35 @@ docker exec opensearch2-app php artisan queue:retry all
 
 ## 7. Scheduler
 
-The scheduler runs `sync:cycle` automatically every 30 minutes (no overlap). Start it with:
+> **Required — not optional.** The scheduler is what keeps OpenSearch in sync and self-healing.
+> If it is not running, indices are never rebuilt automatically: data goes stale and a dropped
+> index stays gone (dashboards fail with `no such index [osool_*]`) until you reindex by hand.
+
+The scheduler runs two jobs:
+
+| Job | Frequency | Purpose |
+|-----|-----------|---------|
+| `sync:cycle` | every 30 min | Pull from the Osool API and rebuild changed indices. |
+| `os:ensure`  | every 5 min  | Self-heal — rebuild any index whose alias has gone missing. |
+
+Start the scheduler with the long-running worker:
 
 ```bash
 docker exec -d opensearch2-app php artisan schedule:work
 ```
 
-Alternatively, add a system cron entry that calls `schedule:run` every minute:
+**Or** add a system cron entry that calls `schedule:run` every minute (preferred for production —
+survives container restarts when paired with `restart: unless-stopped`):
 
 ```
 * * * * * docker exec opensearch2-app php artisan schedule:run >> /dev/null 2>&1
+```
+
+Verify the scheduler is registered and firing:
+
+```bash
+docker exec opensearch2-app php artisan schedule:list           # should list sync:cycle + os:ensure
+docker exec opensearch2-app tail -f storage/logs/os-ensure.log  # confirm it runs every 5 min
 ```
 
 > **Production note:** `docker exec -d` workers die if the `app` container restarts. For a
@@ -309,6 +339,7 @@ docker-compose down -v
 | Initialize DB | `php artisan migrate && php artisan dwh:seed-calendar` |
 | Full data sync | `php artisan sync:cycle` |
 | Reindex OpenSearch only | `php artisan os:reindex <entity>` |
+| Self-heal missing indices | `php artisan os:ensure` |
 | Start queue worker | `php artisan queue:work` |
-| Start scheduler | `php artisan schedule:work` |
+| Start scheduler (required) | `php artisan schedule:work` |
 | Wipe and start fresh | `php artisan dwh:wipe --force` |

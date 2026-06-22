@@ -14,3 +14,12 @@ Schedule::command('sync:cycle')
     ->withoutOverlapping(60)
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/sync-cycle.log'));
+
+// Self-heal: rebuild any OpenSearch index whose alias has gone missing, so a
+// dropped index recovers within minutes instead of 404-ing until the next time
+// its source data changes. Cheap when nothing is missing (one getAlias/entity).
+Schedule::command('os:ensure')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(15)
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/os-ensure.log'));
