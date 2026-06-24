@@ -22,6 +22,7 @@ class AssetIndex
                 'owner_name'          => ['type' => 'keyword'],
                 'property_id'         => ['type' => 'long'],
                 'property_name'       => ['type' => 'keyword'],
+                'unit_id'             => ['type' => 'integer'],
                 'building_id'         => ['type' => 'long'],
                 'building_name'       => ['type' => 'keyword'],
                 'asset_category_id'   => ['type' => 'long'],
@@ -38,6 +39,11 @@ class AssetIndex
                 'warranty_end_date'   => ['type' => 'date', 'format' => 'yyyy-MM-dd'],
                 'under_warranty'      => ['type' => 'boolean'],
                 'linked_wo'           => ['type' => 'boolean'],
+                'total_uptime'        => ['type' => 'double'],
+                'total_downtime'      => ['type' => 'double'],
+                'uptime_pct'          => ['type' => 'float'],
+                'downtime_pct'        => ['type' => 'float'],
+                'last_downtime_at'    => ['type' => 'date'],
                 'created_at'          => ['type' => 'date'],
                 'created_year_month'  => ['type' => 'keyword'],
                 'search_text'         => ['type' => 'text'],
@@ -56,6 +62,7 @@ class AssetIndex
                 a.asset_id, a.asset_tag,
                 a.owner_user_id, u.full_name AS owner_name,
                 a.property_id, p.property_name,
+                a.unit_id,
                 a.building_id, b.building_name,
                 a.asset_category_id, ac.asset_category,
                 a.asset_name_id,     an.asset_name,
@@ -66,6 +73,8 @@ class AssetIndex
                 a.warranty_end_date,
                 (a.warranty_end_date IS NOT NULL AND a.warranty_end_date >= CURRENT_DATE) AS under_warranty,
                 a.linked_wo,
+                a.total_uptime, a.total_downtime, a.uptime_pct, a.downtime_pct,
+                a.last_downtime_at,
                 a.created_at,
                 to_char(a.created_at, 'YYYY-MM') AS created_year_month,
                 COALESCE(
@@ -88,7 +97,7 @@ class AssetIndex
         }
         $sql .= ' ORDER BY a.asset_id';
 
-        $tsFields = ['created_at'];
+        $tsFields = ['created_at', 'last_downtime_at'];
         $total = 0; $buffer = [];
         foreach (DB::cursor($sql, $bindings) as $row) {
             $doc = (array) $row;

@@ -29,9 +29,15 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url('/assets') }}" class="{{ request()->is('assets*') ? 'active' : '' }}">
+                <a href="{{ url('/assets') }}" class="{{ request()->is('assets') ? 'active' : '' }}">
                     <span data-feather="package" class="nav-icon"></span>
                     <span class="menu-text">{{ __('nav.assets') }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url('/assets-depreciation') }}" class="{{ request()->is('assets-depreciation*') ? 'active' : '' }}">
+                    <span data-feather="trending-down" class="nav-icon"></span>
+                    <span class="menu-text">{{ __('nav.assets_depreciation') }}</span>
                 </a>
             </li>
             <li>

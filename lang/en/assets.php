@@ -21,6 +21,7 @@ return [
     // KPI labels
     'kpi' => [
         'Total Assets'      => 'Total assets',
+        'Avg Availability'  => 'Avg availability',
         'Active Assets'     => 'Active assets',
         'Under Warranty'    => 'Under warranty',
         'Categories'        => 'Categories',
@@ -39,6 +40,10 @@ return [
     'ch_building'  => '🏢 By building',
     'ch_name'      => '🔖 By asset name',
     'ch_manufac'   => '🏭 Top manufacturers',
+    'ch_availability' => '🟢 Uptime vs Downtime by Asset Category',
+    'js_uptime'    => 'Uptime %',
+    'js_downtime'  => 'Downtime %',
+    'js_assets'    => 'Assets',
 
     // Table
     'tbl_title'       => 'Latest 50 assets',
@@ -55,4 +60,17 @@ return [
     'st_warranty_active'  => 'Active',
     'st_warranty_expired' => 'Expired',
     'empty'           => 'No matching assets.',
+
+    // Assets availability table
+    'av_title'        => 'Assets availability',
+    'av_export'       => 'Export to Excel',
+    'col_av_name'      => 'Asset Name',
+    'col_av_id'        => 'Asset ID',
+    'col_av_status'    => 'Asset Current Status',
+    'col_av_category'  => 'Asset Category (Service Type)',
+    'col_av_property'  => 'Property',
+    'col_av_unit'      => 'Unit',
+    'col_av_uptime'    => 'Asset Total Uptime',
+    'col_av_downtime'  => 'Asset Total Downtime',
+    'col_av_last_down' => 'Last Downtime Timestamp',
 ];

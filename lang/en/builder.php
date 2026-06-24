@@ -300,6 +300,7 @@ return [
 
     // ── KPI option labels — Assets ────────────────────────────────────────────
     'kpi_assets_total_assets'    => 'Total Assets',
+    'kpi_assets_avg_availability'=> 'Avg Availability',
     'kpi_assets_categories'      => 'Categories',
     'kpi_assets_buildings'       => 'Buildings',
     'kpi_assets_with_status'     => 'With Status',
@@ -389,6 +390,7 @@ return [
     'chart_opt_assets_by_building'=> 'By Building',
     'chart_opt_assets_by_name'   => 'By Asset Name',
     'chart_opt_assets_by_manufac'=> 'Top Manufacturers',
+    'chart_opt_assets_availability'=> 'Uptime vs Downtime by Category',
 
     // ── Chart option labels — Contracts ───────────────────────────────────────
     'chart_opt_con_by_type'      => 'Value by Contract Type',

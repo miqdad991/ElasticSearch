@@ -1,0 +1,65 @@
+<?php
+
+return [
+    'page_title' => 'Assets Depreciation Dashboard',
+    'heading'    => 'Assets Depreciation',
+    'subtitle'   => 'Depreciation, financial & operational KPIs across all assets',
+
+    'reset' => 'Reset filters',
+    'apply' => 'Apply',
+    'any'   => '— any —',
+
+    // Filters
+    'f_property'      => 'Property',
+    'f_zone'          => 'Zone',
+    'f_unit'          => 'Unit',
+    'f_supplier'      => 'Supplier / Provider',
+    'f_service_type'  => 'Service type',
+    'f_method'        => 'Depreciation method',
+    'f_status'        => 'Asset status',
+    'f_date'          => 'Reporting date',
+    'st_hard'         => 'Hard',
+    'st_soft'         => 'Soft',
+
+    // KPI stat boxes
+    'kpi_purchase'  => 'Total Purchase Value',
+    'kpi_nbv'       => 'Total NBV',
+    'kpi_accum'     => 'Total Accumulated Depreciation',
+    'kpi_avg_life'  => 'Average Useful Life',
+    'kpi_years'     => 'yrs',
+    'as_of'         => 'as of',
+
+    // Charts
+    'ch_by_property'    => '🏢 Depreciation Expense by Property',
+    'ch_remaining_life' => '⏳ Assets by Remaining Useful Life',
+    'js_current'   => 'Current Year Depreciation',
+    'js_accum'     => 'Accumulated Depreciation',
+    'js_assets'    => 'Assets',
+    'js_share'     => 'Share',
+
+    // Table
+    'tbl_title'   => 'Depreciation details',
+    'col_property'       => 'Property Name',
+    'col_zone'           => 'Zone',
+    'col_unit'           => 'Unit',
+    'col_asset_name'     => 'Asset Name',
+    'col_service_type'   => 'Service Type',
+    'col_asset_number'   => 'Asset Number',
+    'col_asset_tag'      => 'Asset Tag',
+    'col_supplier'       => 'Supplier / Provider',
+    'col_purchase'       => 'Purchase Price',
+    'col_install_date'   => 'Installation Date',
+    'col_dep_period'     => 'Depreciation Start & End',
+    'col_useful_life'    => 'Useful Life (Years)',
+    'col_method'         => 'Depreciation Method',
+    'col_rate'           => 'Depreciation Rate (%)',
+    'col_residual'       => 'Residual Value',
+    'col_annual'         => 'Depreciation / Year',
+    'col_accum'          => 'Accumulated Depreciation',
+    'col_nbv'            => 'Net Book Value (NBV)',
+    'col_last_maint'     => 'Last Maintenance Date',
+    'col_maint_ytd'      => 'Maintenance Cost (YTD)',
+    'col_wo_count'       => 'Work Orders Count',
+    'empty'              => 'No matching assets.',
+    'pending'            => 'Pending WO sync',
+];

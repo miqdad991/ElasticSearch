@@ -19,6 +19,7 @@ return [
 
     'kpi' => [
         'Total Assets'      => 'إجمالي الأصول',
+        'Avg Availability'  => 'متوسط التوفر',
         'Active Assets'     => 'الأصول النشطة',
         'Under Warranty'    => 'تحت الضمان',
         'Categories'        => 'الفئات',
@@ -36,6 +37,10 @@ return [
     'ch_building'  => '🏢 حسب المبنى',
     'ch_name'      => '🔖 حسب اسم الأصل',
     'ch_manufac'   => '🏭 أعلى الشركات المصنعة',
+    'ch_availability' => '🟢 وقت التشغيل مقابل وقت التعطل حسب فئة الأصل',
+    'js_uptime'    => 'نسبة التشغيل',
+    'js_downtime'  => 'نسبة التعطل',
+    'js_assets'    => 'الأصول',
 
     'tbl_title'       => 'أحدث 50 أصلًا',
     'col_tag'         => 'الرمز',
@@ -51,4 +56,17 @@ return [
     'st_warranty_active'  => 'ساري',
     'st_warranty_expired' => 'منتهي',
     'empty'           => 'لا توجد أصول مطابقة.',
+
+    // جدول توفر الأصول
+    'av_title'        => 'توفر الأصول',
+    'av_export'       => 'تصدير إلى Excel',
+    'col_av_name'      => 'اسم الأصل',
+    'col_av_id'        => 'رقم الأصل',
+    'col_av_status'    => 'الحالة الحالية للأصل',
+    'col_av_category'  => 'فئة الأصل (نوع الخدمة)',
+    'col_av_property'  => 'العقار',
+    'col_av_unit'      => 'الوحدة',
+    'col_av_uptime'    => 'إجمالي وقت تشغيل الأصل',
+    'col_av_downtime'  => 'إجمالي وقت تعطل الأصل',
+    'col_av_last_down' => 'الوقت لآخر تعطل',
 ];

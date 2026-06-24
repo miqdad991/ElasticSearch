@@ -107,6 +107,7 @@ class DashboardBuilderController extends Controller
 
     public const ASSETS_KPI_OPTIONS = [
         'total_assets'    => ['label' => 'Total Assets',     'color' => '#14b8a6'],
+        'avg_availability'=> ['label' => 'Avg Availability', 'color' => '#06b6d4'],
         'categories'      => ['label' => 'Categories',       'color' => '#6366f1'],
         'buildings'       => ['label' => 'Buildings',        'color' => '#f59e0b'],
         'with_status'     => ['label' => 'With Status',      'color' => '#22c55e'],
@@ -116,12 +117,13 @@ class DashboardBuilderController extends Controller
     ];
 
     public const ASSETS_CHART_OPTIONS = [
-        'monthly'      => ['label' => 'Assets Added per Month', 'types' => ['area', 'line', 'bar']],
-        'by_category'  => ['label' => 'By Category',           'types' => ['bar', 'donut', 'pie']],
-        'by_status'    => ['label' => 'By Status',             'types' => ['donut', 'pie', 'bar']],
-        'by_building'  => ['label' => 'By Building',           'types' => ['bar']],
-        'by_name'      => ['label' => 'By Asset Name',         'types' => ['bar']],
-        'by_manufac'   => ['label' => 'Top Manufacturers',     'types' => ['bar']],
+        'monthly'      => ['label' => 'Assets Added per Month',          'types' => ['area', 'line', 'bar']],
+        'by_category'  => ['label' => 'By Category',                     'types' => ['bar', 'donut', 'pie']],
+        'by_status'    => ['label' => 'By Status',                       'types' => ['donut', 'pie', 'bar']],
+        'by_building'  => ['label' => 'By Building',                     'types' => ['bar']],
+        'by_name'      => ['label' => 'By Asset Name',                   'types' => ['bar']],
+        'by_manufac'   => ['label' => 'Top Manufacturers',              'types' => ['bar']],
+        'availability' => ['label' => 'Uptime vs Downtime by Category', 'types' => ['bar']],
     ];
 
     public const CONTRACTS_KPI_OPTIONS = [
@@ -607,12 +609,20 @@ class DashboardBuilderController extends Controller
                     'under_warranty' => ['filter'      => ['term' => ['under_warranty'  => true]]],
                     'distinct_cat'   => ['cardinality' => ['field' => 'asset_category_id']],
                     'distinct_bldg'  => ['cardinality' => ['field' => 'building_id']],
+                    'avg_availability'=> ['avg' => ['field' => 'uptime_pct']],
                     'monthly'        => ['terms' => ['field' => 'created_year_month', 'size' => 60, 'order' => ['_key' => 'asc']]],
                     'by_category'    => ['terms' => ['field' => 'asset_category',     'size' => 15]],
                     'by_status'      => ['terms' => ['field' => 'asset_status_name',  'size' => 15]],
                     'by_building'    => ['terms' => ['field' => 'building_name',       'size' => 15]],
                     'by_name'        => ['terms' => ['field' => 'asset_name',          'size' => 15]],
                     'by_manufac'     => ['terms' => ['field' => 'manufacturer_name',   'size' => 10]],
+                    'availability'   => [
+                        'terms' => ['field' => 'asset_category', 'size' => 20, 'order' => ['avg_down' => 'desc']],
+                        'aggs'  => [
+                            'avg_up'   => ['avg' => ['field' => 'uptime_pct']],
+                            'avg_down' => ['avg' => ['field' => 'downtime_pct']],
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -622,6 +632,7 @@ class DashboardBuilderController extends Controller
 
         $kpiValues = [
             'total_assets'   => (int)  ($resp['hits']['total']['value']          ?? 0),
+            'avg_availability' => round($aggs['avg_availability']['value']       ?? 0, 1),
             'categories'     => (int)  ($aggs['distinct_cat']['value']           ?? 0),
             'buildings'      => (int)  ($aggs['distinct_bldg']['value']          ?? 0),
             'with_status'    => (int)  ($aggs['with_status']['doc_count']        ?? 0),
@@ -637,6 +648,12 @@ class DashboardBuilderController extends Controller
             'by_building' => $bucket('by_building'),
             'by_name'     => $bucket('by_name'),
             'by_manufac'  => $bucket('by_manufac'),
+            'availability'=> collect($aggs['availability']['buckets'] ?? [])->map(fn($b) => [
+                'label'    => (string) $b['key'],
+                'uptime'   => round($b['avg_up']['value']   ?? 0, 1),
+                'downtime' => round($b['avg_down']['value'] ?? 0, 1),
+                'count'    => $b['doc_count'],
+            ])->values(),
         ];
 
         $rows       = $config['show_table'] ? collect($resp['hits']['hits'] ?? [])->pluck('_source') : collect();
@@ -922,7 +939,7 @@ class DashboardBuilderController extends Controller
             return ['name' => 'My Users Dashboard', 'kpis' => ['total_users', 'active', 'inactive', 'deleted'], 'kpi_cols' => 4, 'charts' => $charts, 'show_filters' => true, 'show_map' => false, 'show_table' => true];
         }
         if ($type === 'assets') {
-            return ['name' => 'My Assets Dashboard', 'kpis' => ['total_assets', 'categories', 'under_warranty', 'total_value'], 'kpi_cols' => 4, 'charts' => $charts, 'show_filters' => true, 'show_map' => false, 'show_table' => true];
+            return ['name' => 'My Assets Dashboard', 'kpis' => ['total_assets', 'avg_availability', 'under_warranty', 'total_value'], 'kpi_cols' => 4, 'charts' => $charts, 'show_filters' => true, 'show_map' => false, 'show_table' => true];
         }
         if ($type === 'contracts') {
             return ['name' => 'My Contracts Dashboard', 'kpis' => ['total_contracts', 'total_value', 'paid_total', 'overdue_total'], 'kpi_cols' => 4, 'charts' => $charts, 'show_filters' => true, 'show_map' => false, 'show_table' => true];

@@ -115,6 +115,7 @@
     @php
         $assetsKpiOpts = \App\Http\Controllers\DashboardBuilderController::ASSETS_KPI_OPTIONS;
         $currencyKpis  = ['total_value'];
+        $percentKpis   = ['avg_availability'];
     @endphp
     <div class="kpi-grid" style="grid-template-columns:repeat({{ $config['kpi_cols'] }},minmax(0,1fr));margin-bottom:1rem;">
         @foreach($config['kpis'] as $kpiKey)
@@ -122,7 +123,8 @@
                 @php
                     $opt    = $assetsKpiOpts[$kpiKey];
                     $val    = $kpiValues[$kpiKey] ?? 0;
-                    $fmtVal = in_array($kpiKey, $currencyKpis) ? number_format($val, 2) : number_format($val);
+                    $fmtVal = in_array($kpiKey, $currencyKpis) ? number_format($val, 2)
+                            : (in_array($kpiKey, $percentKpis) ? number_format($val, 1) . '%' : number_format($val));
                 @endphp
                 <div class="card-soft kpi" style="--kpi-color:{{ $opt['color'] }};">
                     <style>.kpi[style*="{{ $opt['color'] }}"]:before { background:{{ $opt['color'] }}; }</style>
@@ -204,6 +206,17 @@
                 <div class="no-data">{{ __('builder.no_data') }}</div>
             @else
                 <div id="chart_by_manufac"></div>
+            @endif
+        </div>
+        @endif
+
+        @if($config['charts']['availability']['enabled'] ?? false)
+        <div class="card-soft chart-wide">
+            <div class="card-title">{{ __('assets.ch_availability') }}</div>
+            @if(($chartData['availability'] ?? collect())->isEmpty())
+                <div class="no-data">{{ __('builder.no_data') }}</div>
+            @else
+                <div id="chart_availability"></div>
             @endif
         </div>
         @endif
@@ -388,6 +401,38 @@ function makeBar(el, labels, values, height, horizontal) {
     const labels = data.map(r => r.label);
     const values = data.map(r => r.count);
     makeBar(el, labels, values, Math.max(280, labels.length * 34), true);
+})();
+@endif
+@endif
+
+@if(!empty($config['charts']['availability']['enabled']))
+@if(!($chartData['availability'] ?? collect())->isEmpty())
+(function(){
+    const el = document.querySelector('#chart_availability');
+    if (!el) return;
+    const AVAIL = @json($chartData['availability']);
+    new ApexCharts(el, {
+        ...baseOpts,
+        chart:{ ...baseOpts.chart, type:'bar', height:320, stacked:true },
+        series:[
+            { name:'{{ __('assets.js_uptime') }}',   data: AVAIL.map(d=>d.uptime) },
+            { name:'{{ __('assets.js_downtime') }}', data: AVAIL.map(d=>d.downtime) },
+        ],
+        xaxis:{ categories: AVAIL.map(d=>d.label), labels:{ style:{ fontSize:'11px' }, rotate:-25 } },
+        yaxis:{ max:100, min:0, tickAmount:5, labels:{ formatter:v=>Math.round(v)+'%' } },
+        colors:['#22c55e','#ef4444'],
+        plotOptions:{ bar:{ borderRadius:4, columnWidth:'55%' } },
+        legend:{ show:true, position:'top' }, fill:{ opacity:1 },
+        tooltip:{ shared:false, intersect:true, custom: ({ dataPointIndex }) => {
+            const d = AVAIL[dataPointIndex] || {};
+            return '<div style="padding:8px 12px;font-size:12px;">'
+                + '<div style="font-weight:700;margin-bottom:4px;">'+ (d.label||'') +'</div>'
+                + '<div><span style="color:#22c55e;">●</span> {{ __('assets.js_uptime') }}: <b>'+ (d.uptime||0) +'%</b></div>'
+                + '<div><span style="color:#ef4444;">●</span> {{ __('assets.js_downtime') }}: <b>'+ (d.downtime||0) +'%</b></div>'
+                + '<div style="margin-top:4px;color:#64748b;">{{ __('assets.js_assets') }}: <b>'+ (d.count||0) +'</b></div>'
+                + '</div>';
+        } },
+    }).render();
 })();
 @endif
 @endif

@@ -9,14 +9,14 @@
     .kpi-1::before { background:#14b8a6; } .kpi-2::before { background:#6366f1; }
     .kpi-3::before { background:#f59e0b; } .kpi-4::before { background:#22c55e; }
     .kpi-5::before { background:#94a3b8; } .kpi-6::before { background:#a855f7; }
-    .kpi-7::before { background:#ef4444; }
+    .kpi-7::before { background:#ef4444; } .kpi-8::before { background:#06b6d4; }
     .kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; font-weight:600; }
     .kpi-value { font-size:1.5rem; font-weight:700; color:#0f172a; margin-top:.25rem; }
     .pill { display:inline-block; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; }
     .grid-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
     .grid-charts { display:grid; grid-template-columns:1fr; gap:1rem; }
     @media (min-width:768px) {
-        .grid-cards { grid-template-columns:repeat(7,minmax(0,1fr)); }
+        .grid-cards { grid-template-columns:repeat(8,minmax(0,1fr)); }
         .grid-charts { grid-template-columns:1fr 1fr; }
         .span-2 { grid-column:span 2; }
     }
@@ -98,6 +98,9 @@
     </div>
 
     <div class="grid-charts mb-3">
+        <div class="card-soft span-2"><h6>{{ __('assets.ch_availability') }}</h6><div id="ch_availability"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_by_property') }}</h6><div id="ch_dep_property"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_remaining_life') }}</h6><div id="ch_dep_remaining"></div></div>
         <div class="card-soft span-2"><h6>{{ __('assets.ch_monthly') }}</h6><div id="ch_monthly"></div></div>
         <div class="card-soft"><h6>{{ __('assets.ch_category') }}</h6><div id="ch_category"></div></div>
         <div class="card-soft"><h6>{{ __('assets.ch_status') }}</h6><div id="ch_status"></div></div>
@@ -146,6 +149,57 @@
             </table>
         </div>
     </div>
+
+    @php
+        $fmtDur = function ($s) {
+            if ($s === null || $s === '') return '—';
+            $s = (int) $s;
+            $d = intdiv($s, 86400); $h = intdiv($s % 86400, 3600); $m = intdiv($s % 3600, 60);
+            $p = [];
+            if ($d) $p[] = "{$d}d";
+            if ($h) $p[] = "{$h}h";
+            if ($m || !$p) $p[] = "{$m}m";
+            return implode(' ', $p);
+        };
+    @endphp
+
+    <div class="card-soft mt-3" style="padding:0;overflow:hidden;">
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-weight:600;">{{ __('assets.av_title') }}</span>
+            <a href="{{ url('/assets/availability/export') }}?{{ http_build_query($filters) }}" class="btn btn-sm btn-success">{{ __('assets.av_export') }}</a>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="table table-sm mb-0">
+                <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
+                <tr>@foreach ([__('assets.col_av_name'),__('assets.col_av_id'),__('assets.col_av_status'),__('assets.col_av_category'),__('assets.col_av_property'),__('assets.col_av_unit'),__('assets.col_av_uptime'),__('assets.col_av_downtime'),__('assets.col_av_last_down')] as $h)<th>{{ $h }}</th>@endforeach</tr>
+                </thead>
+                <tbody>
+                @foreach ($rows as $r)
+                    <tr>
+                        <td>{{ $r['asset_name'] ?? '—' }}</td>
+                        <td><code style="color:#0f766e;">{{ $r['asset_id'] ?? '' }}</code></td>
+                        <td>
+                            @if (!empty($r['asset_status_name']))
+                                <span class="pill" style="background:#dbeafe;color:#1d4ed8;">{{ $r['asset_status_name'] }}</span>
+                            @else
+                                <span class="pill" style="background:#f1f5f9;color:#475569;">{{ __('assets.st_none') }}</span>
+                            @endif
+                        </td>
+                        <td>{{ $r['asset_category'] ?? '—' }}</td>
+                        <td>{{ $r['property_name'] ?? '—' }}</td>
+                        <td>{{ $r['unit_id'] ?? '—' }}</td>
+                        <td>{{ $fmtDur($r['total_uptime'] ?? null) }}</td>
+                        <td>{{ $fmtDur($r['total_downtime'] ?? null) }}</td>
+                        <td>{{ !empty($r['last_downtime_at']) ? \Illuminate\Support\Carbon::parse($r['last_downtime_at'])->format('Y-m-d H:i') : '—' }}</td>
+                    </tr>
+                @endforeach
+                @if ($rows->isEmpty())
+                    <tr><td colspan="9" class="text-center text-muted py-4">{{ __('assets.empty') }}</td></tr>
+                @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -159,6 +213,31 @@ const baseChart = (extra={}) => ({
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });
+// Uptime vs Downtime by Asset Category — grouped/stacked bar (0–100%).
+const AVAIL = charts.availability || [];
+if (AVAIL.length) {
+    new ApexCharts(document.querySelector('#ch_availability'), baseChart({
+        chart:{ type:'bar', height:320, stacked:true },
+        series:[
+            { name:'{{ __('assets.js_uptime') }}',   data: AVAIL.map(d=>d.uptime) },
+            { name:'{{ __('assets.js_downtime') }}', data: AVAIL.map(d=>d.downtime) },
+        ],
+        xaxis:{ categories: AVAIL.map(d=>d.label), labels:{ rotate:-25 } },
+        yaxis:{ max:100, min:0, tickAmount:5, labels:{ formatter:v=>Math.round(v)+'%' } },
+        colors:['#22c55e','#ef4444'],
+        plotOptions:{ bar:{ borderRadius:4, columnWidth:'55%' } },
+        legend:{ show:true, position:'top' }, fill:{ opacity:1 },
+        tooltip:{ shared:false, intersect:true, custom: ({ dataPointIndex }) => {
+            const d = AVAIL[dataPointIndex] || {};
+            return '<div style="padding:8px 12px;font-size:12px;">'
+                + '<div style="font-weight:700;margin-bottom:4px;">'+ (d.label||'') +'</div>'
+                + '<div><span style="color:#22c55e;">●</span> {{ __('assets.js_uptime') }}: <b>'+ (d.uptime||0) +'%</b></div>'
+                + '<div><span style="color:#ef4444;">●</span> {{ __('assets.js_downtime') }}: <b>'+ (d.downtime||0) +'%</b></div>'
+                + '<div style="margin-top:4px;color:#64748b;">{{ __('assets.js_assets') }}: <b>'+ (d.count||0) +'</b></div>'
+                + '</div>';
+        } },
+    })).render();
+}
 new ApexCharts(document.querySelector('#ch_monthly'), baseChart({
     chart:{ type:'area', height:280 },
     series:[{ name:'{{ __('assets.heading') }}', data: charts.monthly.map(d=>d.count) }],
@@ -190,6 +269,43 @@ const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), 
     legend:{ position:'bottom', fontSize:'12px' },
     plotOptions:{ pie:{ donut:{ size:'68%', labels:{ show:true, total:{ show:true, label:'{{ __('builder.js_total') }}' } } } } },
     dataLabels:{ enabled:true, style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
+})).render();
+// Mirrored depreciation charts.
+const depProperty = charts.dep_by_property || [];
+const depRemaining = charts.dep_remaining_life || [];
+if (depProperty.length) {
+    new ApexCharts(document.querySelector('#ch_dep_property'), baseChart({
+        chart:{ type:'bar', height:300 },
+        series:[
+            { name:'{{ __('depreciation.js_current') }}', data: depProperty.map(d=>d.current) },
+            { name:'{{ __('depreciation.js_accum') }}',   data: depProperty.map(d=>d.accumulated) },
+        ],
+        xaxis:{ categories: depProperty.map(d=>d.label), labels:{ rotate:-25, style:{ fontSize:'11px' } } },
+        yaxis:{ labels:{ formatter:v=>Intl.NumberFormat(undefined,{notation:'compact'}).format(v) } },
+        colors:['#0ea5e9','#2563eb'], plotOptions:{ bar:{ borderRadius:4, columnWidth:'60%' } },
+        legend:{ show:true, position:'top' },
+        tooltip:{ shared:false, intersect:true, custom: ({ dataPointIndex }) => {
+            const d = depProperty[dataPointIndex] || {};
+            const m = v => Intl.NumberFormat(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}).format(v||0);
+            return '<div style="padding:8px 12px;font-size:12px;"><div style="font-weight:700;margin-bottom:4px;">'+(d.label||'')+'</div>'
+                + '<div><span style="color:#0ea5e9;">●</span> {{ __('depreciation.js_current') }}: <b>'+m(d.current)+' SAR</b></div>'
+                + '<div><span style="color:#2563eb;">●</span> {{ __('depreciation.js_accum') }}: <b>'+m(d.accumulated)+' SAR</b></div>'
+                + '<div style="margin-top:4px;color:#64748b;">{{ __('depreciation.js_assets') }}: <b>'+(d.count||0)+'</b></div></div>';
+        } },
+    })).render();
+}
+new ApexCharts(document.querySelector('#ch_dep_remaining'), baseChart({
+    chart:{ type:'bubble', height:300 },
+    series:[{ name:'{{ __('depreciation.js_assets') }}', data: depRemaining.map((d,i)=>({ x:i+1, y:d.count, z:d.count })) }],
+    xaxis:{ tickAmount:4, min:0, max:5, labels:{ formatter:(v)=>{ const d=depRemaining[Math.round(v)-1]; return d?d.label:''; } } },
+    yaxis:{ min:0, labels:{ formatter:v=>Math.round(v) } },
+    fill:{ opacity:0.8 }, colors:['#2563eb'], plotOptions:{ bubble:{ minBubbleRadius:10, maxBubbleRadius:42 } },
+    tooltip:{ custom: ({ dataPointIndex }) => {
+        const d = depRemaining[dataPointIndex] || {};
+        return '<div style="padding:8px 12px;font-size:12px;"><div style="font-weight:700;margin-bottom:4px;">'+(d.label||'')+'</div>'
+            + '<div>{{ __('depreciation.js_assets') }}: <b>'+(d.count||0)+'</b></div>'
+            + '<div style="color:#64748b;">{{ __('depreciation.js_share') }}: <b>'+(d.percent||0)+'%</b></div></div>';
+    } },
 })).render();
 verticalBar('#ch_category', charts.by_category);
 donut('#ch_status',         charts.by_status);

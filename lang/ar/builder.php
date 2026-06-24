@@ -300,6 +300,7 @@ return [
 
     // ── KPI option labels — Assets ────────────────────────────────────────────
     'kpi_assets_total_assets'    => 'إجمالي الأصول',
+    'kpi_assets_avg_availability'=> 'متوسط التوفر',
     'kpi_assets_categories'      => 'الفئات',
     'kpi_assets_buildings'       => 'المباني',
     'kpi_assets_with_status'     => 'له حالة',
@@ -389,6 +390,7 @@ return [
     'chart_opt_assets_by_building' => 'حسب المبنى',
     'chart_opt_assets_by_name'     => 'حسب اسم الأصل',
     'chart_opt_assets_by_manufac'  => 'أبرز الشركات المصنعة',
+    'chart_opt_assets_availability'=> 'وقت التشغيل مقابل وقت التعطل حسب الفئة',
 
     // ── Chart option labels — Contracts ───────────────────────────────────────
     'chart_opt_con_by_type'      => 'القيمة حسب نوع العقد',

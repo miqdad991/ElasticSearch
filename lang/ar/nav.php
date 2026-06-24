@@ -13,6 +13,7 @@ return [
     'work_orders'       => 'أوامر العمل',
     'properties'        => 'العقارات',
     'assets'            => 'الأصول',
+    'assets_depreciation' => 'إهلاك الأصول',
     'users'             => 'المستخدمون',
     'billing'           => 'الفواتير',
     'contracts'         => 'العقود',

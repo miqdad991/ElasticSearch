@@ -13,6 +13,7 @@ return [
     'work_orders'       => 'Work Orders',
     'properties'        => 'Properties',
     'assets'            => 'Assets',
+    'assets_depreciation' => 'Assets Depreciation',
     'users'             => 'Users',
     'billing'           => 'Billing',
     'contracts'         => 'Contracts',

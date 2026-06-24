@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssetsDashboardController;
+use App\Http\Controllers\AssetsDepreciationDashboardController;
 use App\Http\Controllers\BillingDashboardController;
 use App\Http\Controllers\ContractsDashboardController;
 use App\Http\Controllers\DashboardBuilderController;
@@ -39,6 +40,8 @@ Route::middleware('require.sso')->group(function () {
     Route::get('/work-orders', [WorkOrdersDashboardController::class, 'index']);
     Route::get('/properties', [PropertiesDashboardController::class, 'index']);
     Route::get('/assets',     [AssetsDashboardController::class,    'index']);
+    Route::get('/assets/availability/export', [AssetsDashboardController::class, 'exportAvailability'])->name('assets.availability.export');
+    Route::get('/assets-depreciation', [AssetsDepreciationDashboardController::class, 'index'])->name('assets.depreciation');
     Route::get('/users',      [UsersDashboardController::class,     'index']);
     Route::get('/billing',    [BillingDashboardController::class,   'index']);
     Route::get('/contracts',  [ContractsDashboardController::class, 'index']);
