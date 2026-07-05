@@ -42,6 +42,7 @@ Route::middleware('require.sso')->group(function () {
     Route::get('/assets',     [AssetsDashboardController::class,    'index']);
     Route::get('/assets/availability/export', [AssetsDashboardController::class, 'exportAvailability'])->name('assets.availability.export');
     Route::get('/assets-depreciation', [AssetsDepreciationDashboardController::class, 'index'])->name('assets.depreciation');
+    Route::get('/assets-depreciation/export', [AssetsDepreciationDashboardController::class, 'export'])->name('assets.depreciation.export');
     Route::get('/users',      [UsersDashboardController::class,     'index']);
     Route::get('/billing',    [BillingDashboardController::class,   'index']);
     Route::get('/contracts',  [ContractsDashboardController::class, 'index']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Contract\ContractorAnalyticsQuery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use OpenSearch\Client;
@@ -59,6 +60,10 @@ class ContractsDashboardController extends Controller
                         'terms' => ['field' => 'contract_number', 'size' => 10, 'order' => ['v' => 'desc']],
                         'aggs'  => ['v' => ['sum' => ['field' => 'overdue_total']]],
                     ],
+                    'top_completed'  => [
+                        'terms' => ['field' => 'service_provider_name', 'size' => 10, 'order' => ['c' => 'desc']],
+                        'aggs'  => ['c' => ['sum' => ['field' => 'closed_wo_count']]],
+                    ],
                 ],
             ],
         ]);
@@ -92,6 +97,8 @@ class ContractsDashboardController extends Controller
                 ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
             'top_overdue' => collect($aggs['top_overdue']['buckets'] ?? [])
                 ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => round($b['v']['value'] ?? 0, 2)])->values(),
+            'top_completed' => collect($aggs['top_completed']['buckets'] ?? [])
+                ->map(fn ($b) => ['label' => (string) $b['key'], 'count' => (int) ($b['c']['value'] ?? 0)])->values(),
         ];
 
         // Filter option lists (real labels, not raw IDs). Restrict SPs to those that
@@ -103,10 +110,26 @@ class ContractsDashboardController extends Controller
             ->distinct()->orderBy('sp.name')
             ->pluck('sp.name', 'sp.sp_id');
 
+        // Contractor analytics (service coverage, workforce, portfolio) — computed from
+        // the Postgres marts, honouring the same filters + project scope as the dashboard.
+        $analytics = new ContractorAnalyticsQuery($filters + [
+            'project_id' => session('selected_project_id'),
+        ]);
+        $wf = $analytics->workforce();
+        $workforce = [
+            ['label' => __('contracts.wf_workers'),        'count' => $wf['workers']],
+            ['label' => __('contracts.wf_supervisors'),    'count' => $wf['supervisors']],
+            ['label' => __('contracts.wf_administrators'), 'count' => $wf['administrators']],
+            ['label' => __('contracts.wf_engineers'),      'count' => $wf['engineers']],
+        ];
+
         return view('dashboards.contracts', [
             'filters'     => $filters,
             'cards'       => $cards,
             'charts'      => $charts,
+            'coverage'    => $analytics->serviceCoverage(),
+            'workforce'   => $workforce,
+            'portfolio'   => $analytics->portfolio(),
             'spOptions'   => $spOptions,
             'classLabels' => $classLabels,
             'rows'        => collect($hits)->pluck('_source'),

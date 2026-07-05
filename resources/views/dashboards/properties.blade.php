@@ -125,7 +125,7 @@
                 <tr>
                     <th>{{ __('properties.reg_region') }}</th>
                     <th class="text-right">{{ __('properties.reg_properties') }}</th>
-                    <th class="text-right">{{ __('properties.reg_active_contracts') }}</th>
+                    <th class="text-right">{{ __('properties.reg_active_contractors') }}</th>
                     <th class="text-right">{{ __('properties.reg_work_orders') }}</th>
                     <th class="text-right">{{ __('properties.reg_budget') }}</th>
                     <th class="text-right">{{ __('properties.reg_expense') }}</th>
@@ -136,7 +136,7 @@
                     <tr>
                         <td><strong>{{ $rg['region'] ?: '—' }}</strong></td>
                         <td class="text-right">{{ number_format($rg['properties']) }}</td>
-                        <td class="text-right">{{ number_format($rg['active_contracts']) }}</td>
+                        <td class="text-right">{{ number_format($rg['active_contractors']) }}</td>
                         <td class="text-right">{{ number_format($rg['work_orders']) }}</td>
                         <td class="text-right">{{ number_format($rg['total_budget'], 2) }}</td>
                         <td class="text-right">{{ number_format($rg['total_expense'], 2) }}</td>
@@ -144,6 +144,58 @@
                 @endforeach
                 @if ($regionTable->isEmpty())
                     <tr><td colspan="6" class="text-center text-muted py-4">{{ __('properties.empty') }}</td></tr>
+                @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-soft mb-3" style="padding:0;overflow:hidden;">
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('properties.pf_title') }}</div>
+        <div style="overflow-x:auto;">
+            <table class="table table-sm mb-0" style="white-space:nowrap;">
+                <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
+                <tr>
+                    <th>{{ __('properties.pf_property') }}</th>
+                    <th>{{ __('properties.pf_location') }}</th>
+                    <th class="text-right">{{ __('properties.pf_units') }}</th>
+                    <th class="text-right">{{ __('properties.pf_assets') }}</th>
+                    <th class="text-right">{{ __('properties.pf_asset_value') }}</th>
+                    <th class="text-right">{{ __('properties.pf_active_contracts') }}</th>
+                    <th class="text-right">{{ __('properties.pf_work_orders') }}</th>
+                    <th class="text-right">{{ __('properties.pf_expense') }}</th>
+                    <th class="text-right">{{ __('properties.pf_income') }}</th>
+                    <th class="text-right">{{ __('properties.pf_collection') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($portfolio as $pf)
+                    <tr>
+                        <td>
+                            <strong>{{ $pf['property_name'] ?: '—' }}</strong>
+                            @if (!empty($pf['property_type']))
+                                <span class="pill" style="background:{{ $pf['property_type']==='complex'?'#ede9fe;color:#6d28d9':'#e0f2fe;color:#0369a1' }};margin-left:.35rem;">{{ $pf['property_type'] }}</span>
+                            @endif
+                        </td>
+                        <td>{{ trim(($pf['region_name'] ?? '') . ' · ' . ($pf['city_name'] ?? ''), ' ·') ?: '—' }}</td>
+                        <td class="text-right">{{ number_format($pf['total_units']) }}</td>
+                        <td class="text-right">{{ number_format($pf['asset_count']) }}</td>
+                        <td class="text-right">{{ number_format($pf['asset_value'], 2) }}</td>
+                        <td class="text-right">{{ number_format($pf['active_contracts']) }} <span class="text-muted" style="font-size:11px;">/ {{ number_format($pf['contract_count']) }}</span></td>
+                        <td class="text-right">{{ number_format($pf['wo_count']) }} @if($pf['open_wo'] > 0)<span class="pill" style="background:#fef3c7;color:#b45309;">{{ number_format($pf['open_wo']) }} {{ __('properties.pf_open') }}</span>@endif</td>
+                        <td class="text-right">{{ number_format($pf['total_expense'], 2) }}</td>
+                        <td class="text-right">{{ number_format($pf['annual_income'], 2) }}</td>
+                        <td class="text-right">
+                            @if ($pf['collection_rate'] === null)
+                                <span class="text-muted">—</span>
+                            @else
+                                <span style="font-weight:600;color:{{ $pf['collection_rate'] >= 80 ? '#047857' : ($pf['collection_rate'] >= 50 ? '#b45309' : '#b91c1c') }};">{{ $pf['collection_rate'] }}%</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+                @if (empty($portfolio))
+                    <tr><td colspan="10" class="text-center text-muted py-4">{{ __('properties.empty') }}</td></tr>
                 @endif
                 </tbody>
             </table>
@@ -168,7 +220,8 @@
                         <td class="text-right">{{ $r['buildings_count'] ?? 0 }}</td>
                         <td class="text-right">{{ $r['total_floors'] ?? '—' }}</td>
                         <td class="text-right">{{ $r['total_units'] ?? '—' }}</td>
-                        <td><span class="pill" style="background:{{ ($r['is_active']??false)?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ ($r['is_active']??false) ? __('properties.st_completed') : __('properties.st_draft') }}</span></td>
+                        @php $completed = (int) ($r['status'] ?? 0) === 1; @endphp
+                        <td><span class="pill" style="background:{{ $completed?'#d1fae5;color:#047857':'#f1f5f9;color:#475569' }}">{{ $completed ? __('properties.st_completed') : __('properties.st_draft') }}</span></td>
                         <td>{{ !empty($r['created_at']) ? \Illuminate\Support\Carbon::parse($r['created_at'])->format('Y-m-d') : '—' }}</td>
                     </tr>
                 @endforeach

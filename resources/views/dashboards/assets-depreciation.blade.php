@@ -40,7 +40,10 @@
             <h2 class="gradient-title" style="font-size:1.75rem;margin:0;">{{ __('depreciation.heading') }}</h2>
             <p style="color:#64748b;font-size:.875rem;margin:.25rem 0 0;">{{ __('depreciation.subtitle') }} · {{ __('depreciation.as_of') }} {{ $reportingDate }}</p>
         </div>
-        <a href="{{ url('/assets-depreciation') }}" class="btn btn-sm btn-outline-secondary">{{ __('depreciation.reset') }}</a>
+        <div style="display:flex;gap:.5rem;">
+            <a href="{{ route('assets.depreciation.export', request()->query()) }}" class="btn btn-sm btn-primary">{{ __('depreciation.export') }}</a>
+            <a href="{{ url('/assets-depreciation') }}" class="btn btn-sm btn-outline-secondary">{{ __('depreciation.reset') }}</a>
+        </div>
     </div>
 
     <form method="get" class="card-soft mb-3">
@@ -134,6 +137,10 @@
     <div class="grid-charts mb-3">
         <div class="card-soft"><h6>{{ __('depreciation.ch_by_property') }}</h6><div id="ch_by_property"></div></div>
         <div class="card-soft"><h6>{{ __('depreciation.ch_remaining_life') }}</h6><div id="ch_remaining_life"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_by_category') }}</h6><div id="ch_by_category"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_by_supplier') }}</h6><div id="ch_by_supplier"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_by_method') }}</h6><div id="ch_by_method"></div></div>
+        <div class="card-soft"><h6>{{ __('depreciation.ch_by_service_type') }}</h6><div id="ch_by_service_type"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
@@ -202,13 +209,39 @@
 
 @section('scripts')
 <script>
-const byProperty = @json($charts['by_property']);
-const remaining  = @json($charts['remaining_life']);
+const byProperty    = @json($charts['by_property']);
+const remaining     = @json($charts['remaining_life']);
+const bySupplier    = @json($charts['by_supplier']);
+const byCategory    = @json($charts['by_category']);
+const byMethod      = @json($charts['by_method']);
+const byServiceType = @json($charts['by_service_type']);
+const PALETTE = ['#2563eb','#0ea5e9','#14b8a6','#22c55e','#f59e0b','#f97316','#ef4444','#a855f7','#ec4899','#6366f1','#84cc16','#06b6d4'];
+const compact = v => Intl.NumberFormat(undefined,{ notation:'compact', maximumFractionDigits:1 }).format(v||0);
+const money2  = v => Intl.NumberFormat(undefined,{ minimumFractionDigits:2, maximumFractionDigits:2 }).format(v||0) + ' SAR';
 const baseChart = (extra={}) => ({
     chart:{ fontFamily:'inherit', toolbar:{ show:false }, animations:{ easing:'easeinout', speed:600 }, dir: IS_RTL ? 'rtl' : 'ltr', ...extra.chart },
     grid:{ borderColor:'#e2e8f0', strokeDashArray:4 },
     dataLabels:{ enabled:false }, legend:{ fontSize:'12px' }, tooltip:{ theme:'light' }, ...extra
 });
+// Horizontal bar of one money metric per group (distributed colors).
+const moneyHBar = (id, data, seriesName, key) => new ApexCharts(document.querySelector(id), baseChart({
+    chart:{ type:'bar', height: Math.max(260, data.length*36) },
+    series:[{ name: seriesName, data: data.map(d=>d[key]) }],
+    xaxis:{ categories: data.map(d=>d.label), labels:{ formatter: compact } },
+    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight:'65%', distributed:true } },
+    colors: data.map((_,i)=>PALETTE[i%PALETTE.length]),
+    legend:{ show:false }, tooltip:{ y:{ formatter: money2 } },
+})).render();
+// NBV-share donut per group.
+const nbvDonut = (id, data) => new ApexCharts(document.querySelector(id), baseChart({
+    chart:{ type:'donut', height:300 },
+    series: data.map(d=>d.nbv), labels: data.map(d=>d.label),
+    colors: PALETTE, stroke:{ width:0 },
+    legend:{ position:'bottom', fontSize:'12px' },
+    plotOptions:{ pie:{ donut:{ size:'66%' } } },
+    dataLabels:{ enabled:true, formatter:(p)=>p>=6?Math.round(p)+'%':'', style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
+    tooltip:{ y:{ formatter: money2 } },
+})).render();
 
 // 1) Depreciation Expense by Property — current year vs accumulated.
 new ApexCharts(document.querySelector('#ch_by_property'), baseChart({
@@ -251,5 +284,27 @@ new ApexCharts(document.querySelector('#ch_remaining_life'), baseChart({
             + '</div>';
     } },
 })).render();
+
+// 3) Net Book Value vs Accumulated Depreciation by asset category — grouped columns.
+new ApexCharts(document.querySelector('#ch_by_category'), baseChart({
+    chart:{ type:'bar', height:320 },
+    series:[
+        { name:'{{ __('depreciation.js_nbv') }}',   data: byCategory.map(d=>d.nbv) },
+        { name:'{{ __('depreciation.js_accum') }}', data: byCategory.map(d=>d.accumulated) },
+    ],
+    xaxis:{ categories: byCategory.map(d=>d.label), labels:{ rotate:-25, style:{ fontSize:'11px' } } },
+    yaxis:{ labels:{ formatter: compact } },
+    colors:['#14b8a6','#f59e0b'],
+    plotOptions:{ bar:{ borderRadius:4, columnWidth:'60%' } },
+    legend:{ show:true, position:'top' },
+    tooltip:{ shared:true, intersect:false, y:{ formatter: money2 } },
+})).render();
+
+// 4) Net Book Value by supplier/provider — top providers by book value.
+moneyHBar('#ch_by_supplier', bySupplier, '{{ __('depreciation.js_nbv') }}', 'nbv');
+
+// 5) NBV share by depreciation method, and 6) by service type (hard/soft).
+nbvDonut('#ch_by_method', byMethod);
+nbvDonut('#ch_by_service_type', byServiceType);
 </script>
 @endsection

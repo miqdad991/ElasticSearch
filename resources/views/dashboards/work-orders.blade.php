@@ -168,21 +168,17 @@ new ApexCharts(document.querySelector('#ch_open_closed'), baseChart({
     markers:{ size:3, strokeWidth:2, hover:{ size:5 } },
     legend:{ show:true, position:'top' },
 })).render();
-const verticalBar = (id, data, palette) => new ApexCharts(document.querySelector(id), baseChart({
-    chart:{ type:'bar', height:260 },
-    series:[{ name:'{{ __('builder.js_count') }}', data: data.map(d=>d.count) }],
-    xaxis:{ categories: data.map(d=>d.label), labels:{ rotate:-25 } },
-    plotOptions:{ bar:{ borderRadius:6, columnWidth:'55%', distributed:true } },
-    colors: data.map((_,i)=>(palette||PALETTE)[i%(palette||PALETTE).length]),
-    legend:{ show:false }, fill: GRADIENT,
-})).render();
-const horizontalBar = (id, data) => new ApexCharts(document.querySelector(id), baseChart({
-    chart:{ type:'bar', height: Math.max(260, data.length*36) },
-    series:[{ name:'{{ __('builder.js_count') }}', data: data.map(d=>d.count) }],
-    xaxis:{ categories: data.map(d=>d.label) },
-    plotOptions:{ bar:{ horizontal:true, borderRadius:6, barHeight:'70%', distributed:true } },
-    colors: data.map((_,i)=>PALETTE[i%PALETTE.length]),
-    legend:{ show:false }, fill: GRADIENT,
+// A dimension (journey / priority / asset-category / building) broken down by
+// work-order type as a stacked bar. Horizontal for long category lists, vertical
+// (rotated labels) otherwise. Colors keyed by WO type so all four charts match.
+const WO_TYPE_COLORS = { preventive:'#10b981', reactive:'#ef4444' };
+const stackedByType = (id, data, horizontal=true) => new ApexCharts(document.querySelector(id), baseChart({
+    chart:{ type:'bar', height: horizontal ? Math.max(260, data.categories.length*40) : 280, stacked:true },
+    series: data.series,
+    xaxis:{ categories: data.categories, labels: horizontal ? {} : { rotate:-25 } },
+    plotOptions:{ bar:{ horizontal, borderRadius:4, barHeight:'70%', columnWidth:'55%' } },
+    colors: data.series.map((s,i)=> WO_TYPE_COLORS[s.name] || PALETTE[i%PALETTE.length]),
+    legend:{ show:true, position:'top' }, fill: GRADIENT,
 })).render();
 const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), baseChart({
     chart:{ type:'donut', height:280 },
@@ -194,21 +190,12 @@ const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), 
 })).render();
 donut('#ch_service',  charts.by_service,  ['#f97316','#14b8a6']);
 donut('#ch_wo_type',  charts.by_wo_type,  ['#10b981','#ef4444']);
-verticalBar('#ch_journey',  charts.by_journey);
 donut('#ch_status',    charts.by_status);
-verticalBar('#ch_priority', charts.by_priority, ['#94a3b8','#3b82f6','#f59e0b','#ef4444']);
-horizontalBar('#ch_category', charts.by_category);
-
-// Top buildings, stacked by work-order type. Colors mirror the cost-by-type donut.
-const WO_TYPE_COLORS = { preventive:'#10b981', reactive:'#ef4444' };
-new ApexCharts(document.querySelector('#ch_building'), baseChart({
-    chart:{ type:'bar', height: Math.max(260, charts.by_building.categories.length*40), stacked:true },
-    series: charts.by_building.series,
-    xaxis:{ categories: charts.by_building.categories },
-    plotOptions:{ bar:{ horizontal:true, borderRadius:4, barHeight:'70%' } },
-    colors: charts.by_building.series.map((s,i)=> WO_TYPE_COLORS[s.name] || PALETTE[i%PALETTE.length]),
-    legend:{ show:true, position:'top' }, fill: GRADIENT,
-})).render();
+// Journey / priority / asset-category / building, each stacked by work-order type.
+stackedByType('#ch_journey',  charts.by_journey,  false);
+stackedByType('#ch_priority', charts.by_priority, false);
+stackedByType('#ch_category', charts.by_category);
+stackedByType('#ch_building', charts.by_building);
 
 // Combined: work-order count (bars, left axis) + total cost (line, right axis) per service provider.
 new ApexCharts(document.querySelector('#ch_sp'), baseChart({

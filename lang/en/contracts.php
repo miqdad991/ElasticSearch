@@ -30,11 +30,32 @@ return [
         'WO Extras Total'   => 'WO extras total',
     ],
 
-    'ch_type'    => '📄 Value by contract type',
-    'ch_sp'      => '🏢 Top service providers by total contract value',
-    'ch_overdue' => '🚨 Top contracts by overdue amount',
-    'ax_value'   => 'Contract value',
-    'ax_overdue' => 'Overdue amount',
+    'ch_type'      => '📄 Value by contract type',
+    'ch_sp'        => '🏢 Top service providers by total contract value',
+    'ch_overdue'   => '🚨 Top contracts by overdue amount',
+    'ch_completed' => '✅ Top contractors by completed work orders',
+    'ch_coverage'  => '🧰 Service coverage by category',
+    'ch_workforce' => '👷 Workforce composition by role',
+    'ax_value'     => 'Contract value',
+    'ax_overdue'   => 'Overdue amount',
+    'ax_completed' => 'Completed WOs',
+
+    // Workforce roles
+    'wf_workers'        => 'Workers',
+    'wf_supervisors'    => 'Supervisors',
+    'wf_administrators' => 'Administrators',
+    'wf_engineers'      => 'Engineers',
+
+    // Contractors portfolio table
+    'pf_title'      => '🏗️ Contractors portfolio',
+    'pf_contractor' => 'Contractor',
+    'pf_contracts'  => 'Active / total contracts',
+    'pf_properties' => 'Managed properties',
+    'pf_completed'  => 'Completed jobs',
+    'pf_active_jobs'=> 'Active jobs',
+    'pf_ontime'     => 'On-time rate',
+    'pf_rating'     => 'Rating',
+    'pf_value'      => 'Total value',
 
     'tbl_title'      => 'Top 30 contracts by value',
     'col_contract'   => 'Contract',

@@ -80,7 +80,8 @@
       "Bash(curl -s \"http://localhost:9200/_cat/indices?v&s=index\")",
       "Bash(curl -s \"http://localhost:9200/_cat/allocation?v\")",
       "Bash(git -C /c/xampp/htdocs/laravel/opensearch2 status --short)",
-      "Bash(git -C /c/xampp/htdocs/laravel/opensearch2 log --oneline -3)"
+      "Bash(git -C /c/xampp/htdocs/laravel/opensearch2 log --oneline -3)",
+      "Bash(echo \"---exit:$?---\")"
     ]
   }
 }

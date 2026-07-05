@@ -80,6 +80,9 @@
         <div class="card-soft"><h6>{{ __('contracts.ch_type') }}</h6><div id="ch_type"></div></div>
         <div class="card-soft"><h6>{{ __('contracts.ch_sp') }}</h6><div id="ch_sp"></div></div>
         <div class="card-soft span-2"><h6>{{ __('contracts.ch_overdue') }}</h6><div id="ch_overdue"></div></div>
+        <div class="card-soft span-2"><h6>{{ __('contracts.ch_completed') }}</h6><div id="ch_completed"></div></div>
+        <div class="card-soft"><h6>{{ __('contracts.ch_coverage') }}</h6><div id="ch_coverage"></div></div>
+        <div class="card-soft"><h6>{{ __('contracts.ch_workforce') }}</h6><div id="ch_workforce"></div></div>
     </div>
 
     <div class="card-soft" style="padding:0;overflow:hidden;">
@@ -135,12 +138,55 @@
             </table>
         </div>
     </div>
+
+    <div class="card-soft mt-3" style="padding:0;overflow:hidden;">
+        <div style="padding:.75rem 1rem;border-bottom:1px solid #e2e8f0;font-weight:600;">{{ __('contracts.pf_title') }}</div>
+        <div style="overflow-x:auto;">
+            <table class="table table-sm mb-0" style="white-space:nowrap;">
+                <thead style="background:#f8fafc;color:#64748b;font-size:11px;text-transform:uppercase;">
+                <tr>
+                    <th>{{ __('contracts.pf_contractor') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_contracts') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_properties') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_completed') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_active_jobs') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_ontime') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_rating') }}</th>
+                    <th class="text-right">{{ __('contracts.pf_value') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($portfolio as $c)
+                    <tr>
+                        <td><strong>{{ $c['contractor'] ?: '—' }}</strong></td>
+                        <td class="text-right">{{ number_format($c['active_contracts']) }} <span class="text-muted" style="font-size:11px;">/ {{ number_format($c['total_contracts']) }}</span></td>
+                        <td class="text-right">{{ number_format($c['managed_properties']) }}</td>
+                        <td class="text-right">{{ number_format($c['completed_jobs']) }}</td>
+                        <td class="text-right">{{ number_format($c['active_jobs']) }}</td>
+                        <td class="text-right">
+                            @if ($c['on_time_rate'] === null)
+                                <span class="text-muted">—</span>
+                            @else
+                                <span style="font-weight:600;color:{{ $c['on_time_rate'] >= 80 ? '#047857' : ($c['on_time_rate'] >= 50 ? '#b45309' : '#b91c1c') }};">{{ $c['on_time_rate'] }}%</span>
+                            @endif
+                        </td>
+                        <td class="text-right">{{ $c['rating'] === null ? '—' : '⭐ ' . $c['rating'] }}</td>
+                        <td class="text-right">{{ number_format($c['total_value'], 2) }}</td>
+                    </tr>
+                @endforeach
+                @if (empty($portfolio)) <tr><td colspan="8" class="text-center text-muted py-4">{{ __('contracts.empty') }}</td></tr> @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
 const charts = @json($charts);
+const coverage = @json($coverage);
+const workforce = @json($workforce);
 const PALETTE = ['#6366f1','#22c55e','#f59e0b','#ef4444','#06b6d4','#a855f7','#ec4899','#14b8a6','#f97316','#10b981'];
 const GRADIENT = { type:'gradient', gradient:{ shade:'light', type:'horizontal', shadeIntensity:0.4, opacityFrom:1, opacityTo:0.85, stops:[0,100] } };
 const base = (extra={}) => ({
@@ -168,5 +214,19 @@ const hbar = (id, data, axisTitle, palette) => new ApexCharts(document.querySele
 hbar('#ch_type',    charts.by_type,    '{{ __('contracts.ax_value') }}');
 hbar('#ch_sp',      charts.top_sp,     '{{ __('contracts.ax_value') }}');
 hbar('#ch_overdue', charts.top_overdue,'{{ __('contracts.ax_overdue') }}', ['#ef4444','#f97316','#f59e0b','#dc2626','#b91c1c']);
+hbar('#ch_completed', charts.top_completed,'{{ __('contracts.ax_completed') }}', ['#22c55e','#10b981','#14b8a6','#0ea5e9','#6366f1']);
+
+// Count-share donut — service coverage (contracts per category) & workforce composition.
+const donut = (id, data, palette) => new ApexCharts(document.querySelector(id), base({
+    chart:{ type:'donut', height:300 },
+    series: data.map(d=>d.count), labels: data.map(d=>d.label),
+    colors: palette || PALETTE, stroke:{ width:0 },
+    legend:{ position:'bottom', fontSize:'12px' },
+    plotOptions:{ pie:{ donut:{ size:'66%' } } },
+    dataLabels:{ enabled:true, formatter:(p)=>p>=6?Math.round(p)+'%':'', style:{ fontSize:'11px', fontWeight:600, colors:['#fff'] } },
+    tooltip:{ y:{ formatter: v=>Number(v||0).toLocaleString() } },
+})).render();
+donut('#ch_coverage',  coverage);
+donut('#ch_workforce', workforce, ['#6366f1','#f59e0b','#06b6d4','#22c55e']);
 </script>
 @endsection

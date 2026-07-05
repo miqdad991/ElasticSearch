@@ -5,9 +5,10 @@ return [
     'heading'    => 'Assets Depreciation',
     'subtitle'   => 'Depreciation, financial & operational KPIs across all assets',
 
-    'reset' => 'Reset filters',
-    'apply' => 'Apply',
-    'any'   => '— any —',
+    'reset'  => 'Reset filters',
+    'apply'  => 'Apply',
+    'export' => 'Export CSV',
+    'any'    => '— any —',
 
     // Filters
     'f_property'      => 'Property',
@@ -30,10 +31,15 @@ return [
     'as_of'         => 'as of',
 
     // Charts
-    'ch_by_property'    => '🏢 Depreciation Expense by Property',
-    'ch_remaining_life' => '⏳ Assets by Remaining Useful Life',
+    'ch_by_property'     => '🏢 Depreciation Expense by Property',
+    'ch_remaining_life'  => '⏳ Assets by Remaining Useful Life',
+    'ch_by_category'     => '🗂️ NBV vs Accumulated by Asset Category',
+    'ch_by_supplier'     => '🏭 Net Book Value by Supplier / Provider',
+    'ch_by_method'       => '📉 NBV Share by Depreciation Method',
+    'ch_by_service_type' => '🔧 NBV Share by Service Type',
     'js_current'   => 'Current Year Depreciation',
     'js_accum'     => 'Accumulated Depreciation',
+    'js_nbv'       => 'Net Book Value',
     'js_assets'    => 'Assets',
     'js_share'     => 'Share',
 

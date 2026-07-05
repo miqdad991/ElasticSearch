@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Property\PropertyPortfolioQuery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use OpenSearch\Client;
@@ -56,12 +57,11 @@ class PropertiesDashboardController extends Controller
                     'by_region'     => [
                         'terms' => ['field' => 'region_name', 'size' => 15],
                         'aggs'  => [
-                            'active_c' => ['sum' => ['field' => 'active_contracts']],
-                            'budget'   => ['sum' => ['field' => 'total_budget']],
+                            'budget' => ['sum' => ['field' => 'total_budget']],
                         ],
                     ],
                     'by_city'       => ['terms' => ['field' => 'city_name', 'size' => 15]],
-                    'by_status'     => ['terms' => ['field' => 'is_active', 'size' => 5]],
+                    'by_status'     => ['terms' => ['field' => 'status', 'size' => 5]],
                     'top_property_contracts' => [
                         'terms' => ['field' => 'property_name.raw', 'size' => 15, 'order' => ['c' => 'desc']],
                         'aggs'  => [
@@ -85,7 +85,10 @@ class PropertiesDashboardController extends Controller
                 'distinct_mr'    => ['cardinality' => ['field' => 'maintenance_request_id']],
                 'by_region'      => [
                     'terms' => ['field' => 'region_name', 'size' => 50],
-                    'aggs'  => ['expense' => ['sum' => ['field' => 'cost']]],
+                    'aggs'  => [
+                        'expense'     => ['sum' => ['field' => 'cost']],
+                        'contractors' => ['cardinality' => ['field' => 'service_provider_id']],
+                    ],
                 ],
             ],
         ]);
@@ -129,7 +132,8 @@ class PropertiesDashboardController extends Controller
                 ->map(function ($b) use ($key) {
                     $raw = $b['key'];
                     if ($key === 'by_status') {
-                        $label = (int) $raw === 1 || $raw === true
+                        // Real property-module status: 1 = completed, else draft.
+                        $label = (int) $raw === 1
                             ? __('properties.st_completed')
                             : __('properties.st_draft');
                     } elseif (is_bool($raw)) {
@@ -142,26 +146,28 @@ class PropertiesDashboardController extends Controller
                 ->values();
         };
 
-        // Regional analysis: properties + active contracts + budget come from the
-        // properties index (per-region sub-aggs); work orders + expense come from the
-        // work_orders index keyed by the same region_name.
+        // Regional analysis: properties + budget come from the properties index
+        // (per-region sub-aggs); work orders, active contractors (distinct service
+        // providers) and expense come from the work_orders index keyed by the same
+        // region_name.
         $woByRegion = collect($woResp['aggregations']['by_region']['buckets'] ?? [])
             ->keyBy('key')
             ->map(fn ($b) => [
                 'work_orders' => $b['doc_count'],
+                'contractors' => (int) ($b['contractors']['value'] ?? 0),
                 'expense'     => round($b['expense']['value'] ?? 0, 2),
             ]);
         $regionTable = collect($aggs['by_region']['buckets'] ?? [])
             ->map(function ($b) use ($woByRegion) {
                 $name = (string) $b['key'];
-                $wo   = $woByRegion[$name] ?? ['work_orders' => 0, 'expense' => 0];
+                $wo   = $woByRegion[$name] ?? ['work_orders' => 0, 'contractors' => 0, 'expense' => 0];
                 return [
-                    'region'           => $name,
-                    'properties'       => $b['doc_count'],
-                    'active_contracts' => (int) ($b['active_c']['value'] ?? 0),
-                    'work_orders'      => $wo['work_orders'],
-                    'total_budget'     => round($b['budget']['value'] ?? 0, 2),
-                    'total_expense'    => $wo['expense'],
+                    'region'             => $name,
+                    'properties'         => $b['doc_count'],
+                    'active_contractors' => $wo['contractors'],
+                    'work_orders'        => $wo['work_orders'],
+                    'total_budget'       => round($b['budget']['value'] ?? 0, 2),
+                    'total_expense'      => $wo['expense'],
                 ];
             })
             ->values();
@@ -180,10 +186,17 @@ class PropertiesDashboardController extends Controller
         $cities  = DB::table('marts.dim_city')->where('is_deleted', false)
             ->select('city_id', 'name_en')->orderBy('name_en')->get();
 
+        // Property portfolio breakdown — per-property cross-entity rollups from the
+        // Postgres marts (same filters as the dashboard + project scope).
+        $portfolio = (new PropertyPortfolioQuery($filters + [
+            'project_id' => session('selected_project_id'),
+        ]))->rows();
+
         return view('dashboards.properties', [
             'filters'     => $filters,
             'cards'       => $cards,
             'regionTable' => $regionTable,
+            'portfolio'   => $portfolio,
             'regions'     => $regions,
             'cities'      => $cities,
             'rows'        => collect($hits)->pluck('_source'),

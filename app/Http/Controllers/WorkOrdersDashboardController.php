@@ -56,10 +56,22 @@ class WorkOrdersDashboardController extends Controller
                     'total_cost'         => ['sum' => ['field' => 'cost']],
                     'by_service_type'    => ['terms' => ['field' => 'service_type', 'size' => 10]],
                     'by_wo_type'         => ['terms' => ['field' => 'work_order_type', 'size' => 10]],
-                    'by_journey'         => ['terms' => ['field' => 'workorder_journey', 'size' => 10]],
                     'by_status'          => ['terms' => ['field' => 'status_label', 'size' => 10]],
-                    'by_priority'        => ['terms' => ['field' => 'priority_level', 'size' => 10]],
-                    'by_category'        => ['terms' => ['field' => 'asset_category', 'size' => 10]],
+                    // Journey / priority / asset-category / building are each broken down
+                    // by work-order type via a nested sub-agg, so the view can render them
+                    // as WO-type stacked bars (reshaped by $stackedByType below).
+                    'by_journey'         => [
+                        'terms' => ['field' => 'workorder_journey', 'size' => 10],
+                        'aggs'  => ['by_type' => ['terms' => ['field' => 'work_order_type', 'size' => 10]]],
+                    ],
+                    'by_priority'        => [
+                        'terms' => ['field' => 'priority_level', 'size' => 10],
+                        'aggs'  => ['by_type' => ['terms' => ['field' => 'work_order_type', 'size' => 10]]],
+                    ],
+                    'by_category'        => [
+                        'terms' => ['field' => 'asset_category', 'size' => 10],
+                        'aggs'  => ['by_type' => ['terms' => ['field' => 'work_order_type', 'size' => 10]]],
+                    ],
                     'by_building'        => [
                         'terms' => ['field' => 'building_name', 'size' => 10],
                         'aggs'  => ['by_type' => ['terms' => ['field' => 'work_order_type', 'size' => 10]]],
@@ -122,22 +134,24 @@ class WorkOrdersDashboardController extends Controller
             ->map(fn ($b) => ['label' => (string) $b['key'], 'cost' => round($b['cost_sum']['value'] ?? 0, 2)])
             ->values();
 
-        // Top buildings broken down by work-order type → stacked-bar shape:
-        // { categories: [building…], series: [{ name: type, data: [count per building] }] }.
-        $buildingBuckets = $aggs['by_building']['buckets'] ?? [];
-        $woTypes = collect($buildingBuckets)
-            ->flatMap(fn ($b) => collect($b['by_type']['buckets'] ?? [])->pluck('key'))
-            ->unique()->values();
-        $buildingsByType = [
-            'categories' => collect($buildingBuckets)->map(fn ($b) => (string) $b['key'])->values(),
-            'series'     => $woTypes->map(fn ($type) => [
-                'name' => (string) $type,
-                'data' => collect($buildingBuckets)->map(function ($b) use ($type) {
-                    $hit = collect($b['by_type']['buckets'] ?? [])->firstWhere('key', $type);
-                    return $hit['doc_count'] ?? 0;
-                })->values(),
-            ])->values(),
-        ];
+        // Reshape a terms agg carrying a nested `by_type` sub-agg into stacked-bar
+        // shape: { categories: [label…], series: [{ name: wo_type, data: [count per label] }] }.
+        $stackedByType = function (string $key) use ($aggs) {
+            $buckets = $aggs[$key]['buckets'] ?? [];
+            $woTypes = collect($buckets)
+                ->flatMap(fn ($b) => collect($b['by_type']['buckets'] ?? [])->pluck('key'))
+                ->unique()->values();
+            return [
+                'categories' => collect($buckets)->map(fn ($b) => (string) $b['key'])->values(),
+                'series'     => $woTypes->map(fn ($type) => [
+                    'name' => (string) $type,
+                    'data' => collect($buckets)->map(function ($b) use ($type) {
+                        $hit = collect($b['by_type']['buckets'] ?? [])->firstWhere('key', $type);
+                        return $hit['doc_count'] ?? 0;
+                    })->values(),
+                ])->values(),
+            ];
+        };
 
         return view('dashboards.work-orders', [
             'filters' => $filters,
@@ -155,11 +169,11 @@ class WorkOrdersDashboardController extends Controller
                     ->values(),
                 'by_service'     => $bucket('by_service_type'),
                 'by_wo_type'     => $bucket('by_wo_type'),
-                'by_journey'     => $bucket('by_journey'),
                 'by_status'      => $bucket('by_status'),
-                'by_priority'    => $bucket('by_priority'),
-                'by_category'    => $bucket('by_category'),
-                'by_building'    => $buildingsByType,
+                'by_journey'     => $stackedByType('by_journey'),
+                'by_priority'    => $stackedByType('by_priority'),
+                'by_category'    => $stackedByType('by_category'),
+                'by_building'    => $stackedByType('by_building'),
                 'by_sp'          => collect($aggs['by_sp']['buckets'] ?? [])
                     ->map(fn ($b) => [
                         'label' => (string) $b['key'],

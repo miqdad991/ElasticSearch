@@ -64,10 +64,24 @@ return [
     'reg_title'            => '🗺 Regional analysis',
     'reg_region'           => 'Region',
     'reg_properties'       => 'Total properties',
-    'reg_active_contracts' => 'Active contracts',
+    'reg_active_contractors' => 'Active contractors',
     'reg_work_orders'      => 'Total work orders',
     'reg_budget'           => 'Total budget',
     'reg_expense'          => 'Total expense',
+
+    // Property portfolio breakdown table
+    'pf_title'             => '🏢 Property portfolio breakdown',
+    'pf_property'          => 'Property',
+    'pf_location'          => 'Region · City',
+    'pf_units'             => 'Units',
+    'pf_assets'            => 'Assets',
+    'pf_asset_value'       => 'Asset value',
+    'pf_active_contracts'  => 'Active contracts',
+    'pf_work_orders'       => 'Work orders',
+    'pf_expense'           => 'Total expense',
+    'pf_income'            => 'Annual income',
+    'pf_collection'        => 'Collection %',
+    'pf_open'              => 'open',
 
     // Table
     'tbl_title'   => 'Latest 50 properties',

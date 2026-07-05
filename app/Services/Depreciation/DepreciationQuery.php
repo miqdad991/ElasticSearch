@@ -124,6 +124,46 @@ class DepreciationQuery
         ])->all();
     }
 
+    /**
+     * Grouped depreciation totals by a whitelisted dimension — purchase, NBV,
+     * accumulated dep, current-year dep and asset count per group, ordered by NBV.
+     * The grouping expression is chosen from a fixed map (never user input).
+     */
+    public function breakdown(string $dimension, int $limit = 12): array
+    {
+        $columns = [
+            'supplier'     => "COALESCE(d.supplier_name, '—')",
+            'category'     => "COALESCE(d.asset_category, '—')",
+            'method'       => "COALESCE(NULLIF(d.depreciation_method, ''), '—')",
+            'service_type' => "COALESCE(d.service_type, '—')",
+            'zone'         => "COALESCE(d.zone_name, '—')",
+        ];
+        $expr = $columns[$dimension] ?? $columns['category'];
+
+        [$where, $bindings] = $this->whereParts();
+        $sql = $this->cte() . "
+            SELECT
+                {$expr}                              AS label,
+                COALESCE(sum(d.purchase_price), 0)   AS purchase,
+                COALESCE(sum(d.nbv), 0)              AS nbv,
+                COALESCE(sum(d.accumulated_dep), 0)  AS accumulated,
+                COALESCE(sum(d.annual_dep), 0)       AS current_year,
+                count(*)                             AS cnt
+            FROM dep d {$where}
+            GROUP BY {$expr}
+            ORDER BY nbv DESC NULLS LAST
+            LIMIT {$limit}";
+
+        return array_map(fn ($r) => [
+            'label'       => $r->label,
+            'purchase'    => round((float) $r->purchase, 2),
+            'nbv'         => round((float) $r->nbv, 2),
+            'accumulated' => round((float) $r->accumulated, 2),
+            'current'     => round((float) $r->current_year, 2),
+            'count'       => (int) $r->cnt,
+        ], DB::select($sql, array_merge([$this->reportingDate], $bindings)));
+    }
+
     /** Distinct option lists for the filter controls. */
     public static function filterOptions(): array
     {
